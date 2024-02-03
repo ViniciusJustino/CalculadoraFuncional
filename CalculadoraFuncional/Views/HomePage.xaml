@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="CalculadoraFuncional.Views.HomePage"
+             xmlns:views="clr-namespace:CalculadoraFuncional.Views"
+             xmlns:drawables="clr-namespace:CalculadoraFuncional.Drawables"
+             xmlns:homeViewModel="clr-namespace:CalculadoraFuncional.ViewModels"
+             Title="Home">
+    <ContentPage.BindingContext>
+        <homeViewModel:AllBillsViewModel />
+    </ContentPage.BindingContext>
+    <ContentPage.Resources>
+        <drawables:GraphicsHandler x:Key="drawable" />
+    </ContentPage.Resources>
+    
+
+    <ScrollView>
+        <Grid ColumnDefinitions="*" RowDefinitions="50,300,*" VerticalOptions="Fill">
+            <Label Grid.Row="0" Grid.Column="0"
+                       Text="Home"
+                       VerticalOptions="Center" 
+                       HorizontalOptions="Center" />
+            <ScrollView FlowDirection="LeftToRight"
+                        Orientation="Horizontal"
+                        HorizontalScrollBarVisibility="Always"
+                        VerticalOptions="Fill"
+                        HorizontalOptions="CenterAndExpand"
+                        Grid.Row="1" Grid.Column="0">
+                <GraphicsView x:Name="graphicView"
+                              HeightRequest="300" 
+                              Drawable="{StaticResource drawable}"
+                              WidthRequest="{Binding Source={StaticResource drawable}, Path=Width}"
+                              Margin="5"/>
+            </ScrollView>
+            <ListView Grid.Row="2" Grid.Column="0"
+                      SelectionMode="None"
+                      ItemsSource="{Binding historyBills}">
+                <ListView.Header>
+                    <StackLayout>
+                        <Label Margin="15" HorizontalOptions="Start" Text="Resumo de compras"/>
+                    </StackLayout>
+                </ListView.Header>
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ViewCell>
+                            <Grid ColumnDefinitions="*,*,*"
+                                  RowDefinitions="*"
+                                  Margin="10" >
+                                <Label VerticalOptions="Center" HorizontalOptions="Start" Grid.Row="0" Grid.Column="0" Text="{Binding Month}"/>
+                                <Label VerticalOptions="Center" HorizontalOptions="End" Grid.Row="0" Grid.Column="2" Text="{Binding Total}"/>
+                            </Grid>
+                            
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </Grid>
+    </ScrollView>
+    
+</ContentPage>

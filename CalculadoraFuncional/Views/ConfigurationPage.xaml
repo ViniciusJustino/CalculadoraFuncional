@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="CalculadoraFuncional.Views.ConfigurationPage"
+             xmlns:viewModel="clr-namespace:CalculadoraFuncional.ViewModels"
+             xmlns:theme="clr-namespace:CalculadoraFuncional.Resources.Theme"
+             Title="Configurações">
+    <Grid ColumnDefinitions="*" RowDefinitions="*">
+        <Grid Padding="10"
+              Grid.Column="0" Grid.Row="0"
+              ColumnDefinitions="*,*" RowDefinitions="*"
+              VerticalOptions="Start" 
+              HorizontalOptions="FillAndExpand">
+            <Label Grid.Column="0" Grid.Row="0" 
+                   Text="Tema" 
+                   VerticalOptions="Center" 
+                   HorizontalOptions="Start"/>
+            <Picker
+                  Grid.Column="1" Grid.Row="0"
+                  VerticalOptions="Center"
+                  HorizontalOptions="EndAndExpand"
+                  ItemsSource="{Binding Source={x:Static theme:Theme.AvailableThemes}}"
+                  ItemDisplayBinding="{Binding DisplayName}"
+                  SelectedItem="{Binding Path=Theme, Source={x:Static viewModel:ConfigurationViewModel.Instance}}"/>
+        </Grid>
+        
+    </Grid>
+</ContentPage>

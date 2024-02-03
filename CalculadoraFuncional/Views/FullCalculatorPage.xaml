@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewModels="clr-namespace:CalculadoraFuncional.ViewModels"
+             xmlns:views="clr-namespace:CalculadoraFuncional.Views"
+             x:Class="CalculadoraFuncional.Views.FullCalculatorPage">
+    <ContentPage.BindingContext>
+        <viewModels:HistoryCalculatorViewModel x:Name="historyCalculatorViewModelContext"/>
+    </ContentPage.BindingContext>
+
+    <Grid Margin="5" RowDefinitions="200,*" ColumnDefinitions="*">
+       <Grid VerticalOptions="Start" Grid.Row="0" Grid.Column="0" ColumnDefinitions="50,*" RowDefinitions="200">
+            <Image VerticalOptions="End" HorizontalOptions="Start" Source="{AppThemeBinding Light=cronometro.png, Dark=cronometro_light.png}" StyleClass="" WidthRequest="50" HeightRequest="50" Margin="5" Aspect="AspectFill"/>
+            <CollectionView x:Name="historyCollection"
+                        Grid.Column="1"
+                        Grid.Row="0"
+                        ItemsSource="{Binding historyCalc}"
+                        Margin="5"
+                        ItemsUpdatingScrollMode="KeepLastItemInView"
+                        SelectionMode="Single"
+                        
+                        SelectionChangedCommand="{Binding SelectCalculationCommand}"
+                        SelectionChangedCommandParameter="{Binding Source={RelativeSource Self}, Path=SelectedItem}">
+            
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout Orientation="Vertical"/>
+                </CollectionView.ItemsLayout>
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Margin="5">
+                            <Label Style="{StaticResource borderStyle}" Text="{Binding Expression}" HorizontalOptions="End" FontSize="18"/>
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+            
+        </Grid>
+
+        <views:CalculatorPage x:Name="calculatorPage" Grid.Row="1" Grid.Column="0" />
+
+    </Grid>
+</ContentPage>
