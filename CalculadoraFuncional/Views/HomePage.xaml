@@ -4,15 +4,12 @@
              x:Class="CalculadoraFuncional.Views.HomePage"
              xmlns:views="clr-namespace:CalculadoraFuncional.Views"
              xmlns:drawables="clr-namespace:CalculadoraFuncional.Drawables"
-             xmlns:homeViewModel="clr-namespace:CalculadoraFuncional.ViewModels"
+             xmlns:viewModels="clr-namespace:CalculadoraFuncional.ViewModels"
              Title="Home">
     <ContentPage.BindingContext>
-        <homeViewModel:AllBillsViewModel />
+        <viewModels:AllBillsViewModel />
     </ContentPage.BindingContext>
-    <ContentPage.Resources>
-        <drawables:GraphicsHandler x:Key="drawable" />
-    </ContentPage.Resources>
-    
+
 
     <ScrollView>
         <Grid ColumnDefinitions="*" RowDefinitions="50,300,*" VerticalOptions="Fill">
@@ -28,8 +25,8 @@
                         Grid.Row="1" Grid.Column="0">
                 <GraphicsView x:Name="graphicView"
                               HeightRequest="300" 
-                              Drawable="{StaticResource drawable}"
-                              WidthRequest="{Binding Source={StaticResource drawable}, Path=Width}"
+                              Drawable="{Binding graphicsHandler}"
+                              WidthRequest="{Binding graphicsHandler.Width}"
                               Margin="5"/>
             </ScrollView>
             <ListView Grid.Row="2" Grid.Column="0"

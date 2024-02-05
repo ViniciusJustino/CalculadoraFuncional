@@ -6,6 +6,7 @@ using System.Runtime.Versioning;
 using System.Text;
 using System.Threading.Tasks;
 using CalculadoraFuncional.Models;
+using System.Globalization;
 
 namespace CalculadoraFuncional.Drawables
 {
@@ -20,11 +21,24 @@ namespace CalculadoraFuncional.Drawables
 
         private List<Bill> bills;
 
-        public GraphicsHandler()
+        public GraphicsHandler(ref IEnumerable<Bill> _bills)
         {
-            InitComposeAsync();
+            ComputedColumnsForDraw(ref _bills);
+
+            bills = _bills.ToList();
         }
         public void Draw(ICanvas canvas, RectF dirtyRect)
+        {
+
+            DrawCartesianLines(ref canvas);
+            DrawColumns(ref canvas, bills);
+            DrawDateOfBill(ref canvas, bills);
+
+
+        }
+
+
+        private void DrawCartesianLines(ref ICanvas canvas)
         {
             if (Application.Current.RequestedTheme == AppTheme.Dark)
                 canvas.StrokeColor = Colors.LightGrey;
@@ -36,14 +50,6 @@ namespace CalculadoraFuncional.Drawables
             canvas.StrokeSize = 3;
             canvas.DrawLine(marginCartesianLines, 0, marginCartesianLines, 250);
             canvas.DrawLine(0, 240, _width, 240);
-
-            DrawColumns(ref canvas, bills);
-            
-        }
-
-        private void InitComposeAsync()
-        {
-            bills = ComputedColumnsForDraw();
         }
 
         private void DrawColumns(ref ICanvas canvas, List<Bill> _bills)
@@ -77,12 +83,33 @@ namespace CalculadoraFuncional.Drawables
             }
         }
 
-        private async Task DrawCartesianPointAsync()
+        private void DrawDateOfBill(ref ICanvas canvas, List<Bill> _bills)
         {
-            //SetSetFillPaint
-        }
+            if (bills.Count > 0)
+            {
+                
+                int xPosition = 0;
+                int yPosition = (int)(totalHeigthColumn + marginCartesianLines);
+                string text;
 
-        private List<Bill> ComputedColumnsForDraw()
+                if (Application.Current.RequestedTheme == AppTheme.Dark)
+                    canvas.FontColor = Colors.White;
+                else
+                    canvas.FontColor = Colors.Black;
+                 
+                canvas.FontSize = 11;
+
+                for (int iterator = 0; iterator < _bills.Count; iterator++)
+                {
+                    xPosition += iterator == 0 ? (int)marginCartesianLines + spacingBetweenColumns : widthColumns + spacingBetweenColumns;
+                    text = $"{_bills[iterator].Date.Day.ToString()} {CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(_bills[iterator].Date.Month)}";
+
+                    canvas.DrawString(text, xPosition, yPosition, widthColumns, marginCartesianLines, HorizontalAlignment.Center, VerticalAlignment.Center);
+                }
+            }
+        }
+       
+        private void ComputedColumnsForDraw(ref IEnumerable<Bill> _bills)
         {
 
 
@@ -94,11 +121,10 @@ namespace CalculadoraFuncional.Drawables
              *  xPosition = (iterator * 50) + 5
              */
 
-            var _bills = Models.Bill.LoadAll();
+            
             this.Max = _bills.MaxBy(maxValue => maxValue.Value).Value;
             this.Width = ((_bills.Count() * spacingBetweenColumns) + (_bills.Count() * widthColumns) + marginCartesianLines).ToString();
 
-            return _bills.ToList<Bill>();
         }
     }
 }
