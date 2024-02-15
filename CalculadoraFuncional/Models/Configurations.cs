@@ -9,5 +9,6 @@ namespace CalculadoraFuncional.Models
     internal class Configurations
     {
 
+
     }
 }

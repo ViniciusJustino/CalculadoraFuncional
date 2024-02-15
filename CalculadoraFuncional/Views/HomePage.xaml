@@ -7,12 +7,12 @@
              xmlns:viewModels="clr-namespace:CalculadoraFuncional.ViewModels"
              Title="Home">
     <ContentPage.BindingContext>
-        <viewModels:AllBillsViewModel />
+        <viewModels:HomeViewModel />
     </ContentPage.BindingContext>
 
 
-    <ScrollView>
-        <Grid ColumnDefinitions="*" RowDefinitions="50,300,*" VerticalOptions="Fill">
+    <ScrollView VerticalScrollBarVisibility="Never">
+        <Grid ColumnDefinitions="*" RowDefinitions="50,300,*" VerticalOptions="StartAndExpand">
             <Label Grid.Row="0" Grid.Column="0"
                        Text="Home"
                        VerticalOptions="Center" 
@@ -25,32 +25,45 @@
                         Grid.Row="1" Grid.Column="0">
                 <GraphicsView x:Name="graphicView"
                               HeightRequest="300" 
-                              Drawable="{Binding graphicsHandler}"
-                              WidthRequest="{Binding graphicsHandler.Width}"
+                              Drawable="{Binding GraphicsHandler}"
+                              WidthRequest="{Binding GraphicsHandler.Width}"
                               Margin="5"/>
             </ScrollView>
-            <ListView Grid.Row="2" Grid.Column="0"
-                      SelectionMode="None"
-                      ItemsSource="{Binding historyBills}">
-                <ListView.Header>
-                    <StackLayout>
-                        <Label Margin="15" HorizontalOptions="Start" Text="Resumo de compras"/>
-                    </StackLayout>
-                </ListView.Header>
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <ViewCell>
-                            <Grid ColumnDefinitions="*,*,*"
-                                  RowDefinitions="*"
-                                  Margin="10" >
-                                <Label VerticalOptions="Center" HorizontalOptions="Start" Grid.Row="0" Grid.Column="0" Text="{Binding Month}"/>
-                                <Label VerticalOptions="Center" HorizontalOptions="End" Grid.Row="0" Grid.Column="2" Text="{Binding Total}"/>
-                            </Grid>
-                            
-                        </ViewCell>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
+            <Border Grid.Row="2" Grid.Column="0"
+                    StrokeShape="RoundRectangle 10,10,10,10"
+                    VerticalOptions="FillAndExpand"
+                    Margin="15"
+                    Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray900}}">
+                
+                <ListView 
+                          SelectionMode="Single" 
+                          ItemsSource="{Binding HistoryBills}"
+                          SelectedItem="{Binding ItemBillsSelected}"
+                          IsPullToRefreshEnabled="True"
+                          IsRefreshing="{Binding IsRefreshing}"
+                          RefreshCommand="{Binding RefreshCommand}"
+                          VerticalOptions="StartAndExpand"
+                          Background="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray900}}">
+                    <ListView.Header>
+                        <StackLayout>
+                            <Label Margin="15" HorizontalOptions="CenterAndExpand" Text="Resumo de compras"/>
+                        </StackLayout>
+                    </ListView.Header>
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <ViewCell>
+                                <Grid ColumnDefinitions="*,*"
+                                      RowDefinitions="*"
+                                      Margin="10">
+                                    <Label VerticalOptions="Center" HorizontalOptions="Start" Grid.Row="0" Grid.Column="0" Text="{Binding Month}"/>
+                                    <Label VerticalOptions="Center" HorizontalOptions="End" Grid.Row="0" Grid.Column="2" Text="{Binding Total}"/>
+                                </Grid>
+                            </ViewCell>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+
+            </Border>
         </Grid>
     </ScrollView>
     

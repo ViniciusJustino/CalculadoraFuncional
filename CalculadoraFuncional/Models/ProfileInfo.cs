@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CalculadoraFuncional.Models
 {
-    internal class ListBill
+    class ProfileInfo
     {
     }
 }

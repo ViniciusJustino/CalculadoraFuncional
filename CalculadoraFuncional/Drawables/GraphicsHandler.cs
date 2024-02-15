@@ -33,17 +33,13 @@ namespace CalculadoraFuncional.Drawables
             DrawCartesianLines(ref canvas);
             DrawColumns(ref canvas, bills);
             DrawDateOfBill(ref canvas, bills);
-
-
         }
-
-
         private void DrawCartesianLines(ref ICanvas canvas)
         {
             if (Application.Current.RequestedTheme == AppTheme.Dark)
                 canvas.StrokeColor = Colors.LightGrey;
             else
-                canvas.StrokeColor = Colors.DarkGray;
+                canvas.StrokeColor = Colors.Gray;
 
             float _width = (float)Convert.ToDouble(Width);
 
@@ -51,7 +47,6 @@ namespace CalculadoraFuncional.Drawables
             canvas.DrawLine(marginCartesianLines, 0, marginCartesianLines, 250);
             canvas.DrawLine(0, 240, _width, 240);
         }
-
         private void DrawColumns(ref ICanvas canvas, List<Bill> _bills)
         {
             // SetFillPaint
@@ -82,7 +77,6 @@ namespace CalculadoraFuncional.Drawables
                 }
             }
         }
-
         private void DrawDateOfBill(ref ICanvas canvas, List<Bill> _bills)
         {
             if (bills.Count > 0)
@@ -108,7 +102,6 @@ namespace CalculadoraFuncional.Drawables
                 }
             }
         }
-       
         private void ComputedColumnsForDraw(ref IEnumerable<Bill> _bills)
         {
 

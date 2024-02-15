@@ -11,100 +11,66 @@ using System.Windows.Input;
 using System.Diagnostics;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
+using System.Text.RegularExpressions;
 
 namespace CalculadoraFuncional.ViewModels
 {
-    struct ResultSearch
-    {
-        public int invalidCharIndex, operationCharIndex;
-
-        public ResultSearch(int index1, int index2)
-        {
-            this.invalidCharIndex = index1;
-            this.operationCharIndex = index2;
-        }
-    }
-
+    
     internal class CalculatorViewModel : Behavior<Entry>, IObserver<object>, INotifyPropertyChanged
     {
+        //Properties definition
         private Calculator _calculator;
-        public Calculator calculator { 
+        public Calculator calculator
+        {
             get { return _calculator; }
-            set { 
-                if (_calculator != value) 
+            set
+            {
+                if (_calculator != value)
                 {
                     _calculator = value;
-                    OnPropertyChanged(nameof(CalculatorViewModel));
+                    OnPropertyChanged(nameof(calculator));
+                    OnPropertyChanged(nameof(EntryText));
                 }
-                 
+
             }
         }
-        public HistoryCalculatorViewModel historyCalculator { get; set; }
-
-        public event PropertyChangedEventHandler EntryPropertyChanged;
-
-        public ICommand TextChanged { get; private set; }
-        public ICommand CalculatorButtonClickCommmand { get; private set; }
-        public ICommand DeteleButtonClickCommmand { get; private set; }
-        public ICommand EqualsButtonClickCommmand { get; private set; }
-        public ICommand ScrollCommand { get; private set; }
-
-        [RegularExpression(@"^[0-9+\-*/]+$", ErrorMessage = "Somenete números e operadores numéricos")]
-        public string Expression 
+        public string EntryText
         {
             get => _calculator.Expression;
             set
             {
                 _calculator.Expression = value;
-                OnPropertyChanged(nameof(_calculator.Expression));
+                OnPropertyChanged(nameof(EntryText));
             }
         }
-        public string Id 
-        {   
-            get => _calculator.Id; 
+        public string Result
+        {
+            get => _calculator?.Result?.OperatorValue;
         }
+        public ObservableCollection<Calculator> historyCalc { get; set; }
+
+        //Commands definition
+        public ICommand TextChanged { get; private set; }
+        public ICommand CalculatorButtonClickCommmand { get; private set; }
+        public ICommand DeteleButtonClickCommmand { get; private set; }
+        public ICommand EqualsButtonClickCommmand { get; private set; }
+        public ICommand ScrollCommand { get; private set; }
+        public ICommand SelectCalculationCommand { get; private set; }
+
+        //Events definition
+        //public event PropertyChangedEventHandler EntryPropertyChanged;
 
         public CalculatorViewModel()
         {
             calculator ??= new Models.Calculator();
+            historyCalc = new ObservableCollection<Calculator>();
             CalculatorButtonClickCommmand = new AsyncRelayCommand<string>(CalculatorButtonClickTask);
             DeteleButtonClickCommmand = new AsyncRelayCommand(DeteleButtonClickTask);
             EqualsButtonClickCommmand = new AsyncRelayCommand(EqualsButtonClickTask);
+            SelectCalculationCommand = new AsyncRelayCommand<Calculator>(SelectCalculationTask);
 
+            historyCalc.Add(calculator);
             Subscribe(calculator);
-        }
-        
-        protected override void OnAttachedTo(Entry bindable)
-        {
-            bindable.TextChanged += on_TextChanged;
-            base.OnAttachedTo(bindable);
-        }
-
-        protected override void OnDetachingFrom(Entry bindable)
-        {
-            bindable.TextChanged -= on_TextChanged;
-            base.OnDetachingFrom(bindable);
-        }
-
-        private async Task CalculatorButtonClickTask(string text)
-        {
-            Debug.WriteLine($"Button click '{text}'");
-            Expression += text;
-            OnPropertyChanged(nameof(Expression));
-        }
-
-        private async Task DeteleButtonClickTask()
-        {
-            if (this.Expression?.Length > 0)
-            {
-               Expression = this.Expression?.Remove(this.Expression.Length - 1, 1);
-            }
-        }
-
-        private async Task EqualsButtonClickTask()
-        {
-            calculator?.ProcessCalculate();
-            OnPropertyChanged(nameof(_calculator.Expression));
         }
 
         void on_TextChanged(object sender, TextChangedEventArgs text)
@@ -113,121 +79,321 @@ namespace CalculadoraFuncional.ViewModels
             int oldTextValueLength = string.IsNullOrEmpty(text.OldTextValue) ? 0 : text.OldTextValue.Length;
             Entry entry = (Entry)sender;
 
-            Debug.WriteLine($"Text at entry field '{entry.Text}'");
-            Debug.WriteLine($"Text at old text '{text.OldTextValue}'");
-            Debug.WriteLine($"Text at new text '{text.NewTextValue}'");
-
-            if (!string.IsNullOrEmpty(text.NewTextValue) &&
-                newTextValueLength > oldTextValueLength)
+            if (oldTextValueLength < newTextValueLength)
             {
-                //Insert
-                if(!IsOperatorOrOparationValue(ref entry) && !IsFirstCharAnOperation(ref entry))
+                entry.Text = FilterCharacter(entry?.Text);
+
+                int indexNewChar = AddDifferentCharactersIndex(ref entry, ref text);
+                char newChar = entry.Text[indexNewChar];
+
+                if (char.IsDigit(newChar) || Operation.IsOperation(newChar) || newChar.Equals(','))
                 {
-                    if (SelectWhatIsOperantioAndOperator(ref entry, ref text))
-                        Debug.WriteLine($"Calculation: {calculator?.Operator1?.OperatorValue} {calculator?.Operation?.OperationValue} {calculator?.Operator2?.OperatorValue}");
-                    //OnPropertyChanged(nameof(_calculator.Expression));
+                    if (Operation.IsOperation(newChar))
+                    {
+                        if (!text.OldTextValue.Contains(newChar) || calculator.IsValidCalculation())
+                            HandleOperations(ref entry, newChar);
+                        else
+                            entry.Text = entry.Text.Remove(indexNewChar, 1);
+
+                        if (calculator.IsValidCalculation())
+                            calculator.ProcessCalculate();
+                    }
+                    else if (char.IsDigit(newChar) || newChar.Equals(','))
+                    {
+                        HandleOperators(ref entry, newChar);
+                    }
                 }
-                
             }
-            else if(newTextValueLength < oldTextValueLength)
+            else if (text.OldTextValue.Contains(text.NewTextValue))
             {
-                //Remove
-                //Debug.WriteLine($"Different character: {DifferentCharacters(text.OldTextValue, text.NewTextValue)}");
 
-                //OnPropertyChanged(nameof(Expression));
+                int indexRemoveChar = RemoveDifferentCharactersIndex(ref entry, ref text);
+                char removedChar = text.OldTextValue[indexRemoveChar];
+
+                if (char.IsDigit(removedChar) || removedChar.Equals(','))
+                {
+
+                    HandleRemoveOperators(ref entry, removedChar);
+
+                }
+                else
+                {
+                    HandleRemoveOperations(ref entry, removedChar);
+                }
+
             }
         }
 
-        private bool IsOperatorOrOparationValue(ref Entry entry)
+        private void HandleOperations(ref Entry entry, char newChar)
         {
-            string text = entry.Text;
-
-            int result = SearchInvalidChar(ref text, 0, text.Length - 1);
-
-            if (result != -1)
+            if (calculator.Operation != null)
             {
-                entry.Text = text.Remove(result, 1);
-                return true;
+                if (!calculator.IsValidCalculation())
+                {
+                    int indexOldOperation = entry.Text.IndexOf(calculator.Operation.OperationValue);
+
+                    if (entry.Text.Contains(calculator.Operation.OperationValue) && !calculator.Operation.OperationValue.Equals(newChar))
+                        entry.Text = entry.Text.Remove(indexOldOperation, 1);
+                    else if (!entry.Text.Contains(newChar))
+                        entry.Text += newChar;
+
+                    calculator.Operation.OperationValue = newChar;
+                }
+                else
+                {
+                    if (calculator.NextOperation != null)
+                    {
+                        int indexOldOperation = entry.Text.IndexOf(calculator.NextOperation.OperationValue);
+
+                        entry.Text = entry.Text.Remove(indexOldOperation, 1);
+
+                        calculator.NextOperation.OperationValue = newChar;
+                    }
+                    else
+                    {
+                        calculator.NextOperation ??= new Operation() { OperationValue = newChar };
+                    }
+                }
             }
 
-            return false;
-
+            calculator.Operation ??= new Operation() { OperationValue = newChar };
         }
 
-        private static bool IsFirstCharAnOperation(ref Entry entry)
+        private void HandleOperators(ref Entry entry, char newChar)
         {
-            string text = entry.Text;
+            int indexOperator = 0;
 
-            if(text.Length == 1 && Operation.IsOperation(text[0]))
+            if (calculator.Operation != null)
+                indexOperator = entry.Text.IndexOf((calculator.Operation.OperationValue));
+
+            if (calculator.Operator1 != null)
             {
-                entry.Text = text.Remove(0, 1);
-                return true;
+                if (indexOperator > 0)
+                {
+                    if (!calculator.Operator1.OperatorValue.Equals(entry.Text[..(indexOperator)]))
+                    {
+                        string value = entry.Text[..(indexOperator)];
+
+                        if (value.Length == 1 && value == ",")
+                        {
+                            value.Insert(0, "0");
+                            entry.Text.Insert(0, "0");
+                            indexOperator++;
+                        }
+
+                        Regex regex = new Regex(",");
+                        MatchCollection matches = regex.Matches(value);
+                        int countComma = matches.Count;
+
+                        while (countComma > 1)
+                        {
+                            int indexComma = value.LastIndexOf(',');
+
+                            value = value.Remove(indexComma, 1);
+                            entry.Text = entry.Text.Remove(indexComma, 1);
+                            countComma--;
+                            indexOperator--;
+                        }
+
+                        calculator.Operator1.OperatorValue = value;
+                    }
+                }
+                else
+                {
+                    if (!calculator.Operator1.OperatorValue.Equals(entry.Text))
+                    {
+                        if (entry.Text.Length == 1 && entry.Text == ",")
+                            entry.Text.Insert(0, "0");
+
+
+                        string value = entry.Text;
+
+                        Regex regex = new Regex(",");
+                        MatchCollection matches = regex.Matches(value);
+                        int countComma = matches.Count;
+
+                        while (countComma > 1)
+                        {
+                            int indexComma = value.LastIndexOf(',');
+
+                            value = value.Remove(indexComma, 1);
+                            entry.Text = entry.Text.Remove(indexComma, 1);
+                            countComma--;
+                        }
+
+                        calculator.Operator1.OperatorValue = value;
+                    }
+                }
             }
+            if (calculator.Operator2 != null)
+            {
+                if (indexOperator > 0)
+                {
+                    if (!calculator.Operator2.OperatorValue.Equals(entry.Text[(indexOperator + 1)..]))
+                    {
+                        string value = entry.Text[(indexOperator + 1)..];
 
-            return false;
+                        if (value.Length == 1 && value == ",")
+                        {
+                            value.Insert(0, "0");
+                            entry.Text.Insert(indexOperator + 1, "0");
+                        }
+
+                        Regex regex = new Regex(",");
+                        MatchCollection matches = regex.Matches(value);
+                        int countComma = matches.Count;
+
+                        while (countComma > 1)
+                        {
+                            int indexComma = value.LastIndexOf(',');
+
+                            value = value.Remove(indexComma, 1);
+                            entry.Text = entry.Text.Remove(indexOperator + 1 + indexComma, 1);
+                            countComma--;
+                            indexOperator--;
+                        }
+
+                        calculator.Operator2.OperatorValue = value;
+                    }
+                }
+            }
+            if (calculator.Operator1 == null)
+            {
+                if (indexOperator > 0)
+                {
+                    if (entry.Text[..(indexOperator)].Length == 1 && entry.Text[..(indexOperator)] == ",")
+                    {
+                        entry.Text = entry.Text.Insert(0, "0");
+                        indexOperator++;
+                    }
+
+                    calculator.Operator1 = new Operator() { OperatorValue = entry.Text[..(indexOperator)] };
+                }
+                else
+                {
+                    if (entry.Text.Length == 1 && entry.Text == ",")
+                    {
+                        entry.Text = entry.Text.Insert(0, "0");
+                    }
+
+                    calculator.Operator1 = new Operator() { OperatorValue = entry.Text };
+                }
+            }
+            if (calculator.Operator2 == null)
+            {
+                if (indexOperator > 0)
+                {
+                    string value = entry.Text[(indexOperator + 1)..];
+
+                    if (value.Length == 1 && value == ",")
+                    {
+                        value.Insert(0, "0");
+                        entry.Text = entry.Text.Insert(indexOperator + 1, "0");
+                    }
+
+                    calculator.Operator2 = new Operator() { OperatorValue = value };
+                }
+            }
         }
 
-        private int SearchInvalidChar(ref string text, int start, int end)
+        private void HandleRemoveOperators(ref Entry entry, char removedChar)
         {
-            int mid = (start + end) / 2;
 
-            int result = -1;
-            if ((start + end) % 2 != 0)
+            if (calculator.Operation != null)
             {
-                result = SearchInvalidChar(ref text, start, mid);
-                if (result != -1)
-                    return result;
-                result = SearchInvalidChar(ref text, mid + 1, end);
-                if (result != -1)
-                    return result;
+                int indexOperation = entry.Text.IndexOf(calculator.Operation.OperationValue);
+
+                string alterOperator1 = entry.Text[..indexOperation];
+
+                if (!calculator.Operator1.OperatorValue.Equals(alterOperator1))
+                    calculator.Operator1.OperatorValue = alterOperator1;
+
+                if ((entry.Text.Length - 1) > indexOperation)
+                {
+                    string alterOperator2 = entry.Text[(indexOperation + 1)..];
+
+                    if (!calculator.Operator2.OperatorValue.Equals(alterOperator2))
+                        calculator.Operator2.OperatorValue = alterOperator2;
+                }
+                else
+                    calculator.Operator2 = null;
+
             }
             else
             {
-                if (!Operation.IsOperation(text[mid]) &&
-                    !char.IsDigit(text[mid]))
-                    result = mid;
+                if (entry.Text == null || entry.Text == "")
+                {
+                    calculator.Operator1 = null;
+                }
                 else
                 {
-                    result = -1;
-                }
-
-                if (result == -1 && start != end)
-                {
-                    result = SearchInvalidChar(ref text, start, mid);
-                    if (result != -1)
-                        return result;
-                    result = SearchInvalidChar(ref text, mid, end);
-                    if (result != -1)
-                        return result;
+                    if (!calculator.Operator1.OperatorValue.Equals(entry.Text))
+                        calculator.Operator1.OperatorValue = entry.Text;
                 }
             }
 
-            return result;
         }
 
-        private int DifferentCharactersIndex(ref Entry entry, ref TextChangedEventArgs text)
+        private void HandleRemoveOperations(ref Entry entry, char removedChar)
         {
-            int cursorPosition = entry.CursorPosition;
+            if (!calculator.CalculationCompleted)
+            {
+                if (calculator.Operation != null &&
+                    calculator.Operation.OperationValue.Equals(removedChar))
+                {
+                    calculator.Operation = null;
+                }
+            }
+        }
 
+        private string FilterCharacter(string entryText)
+        {
+            var text = new StringBuilder();
+
+            if (entryText != null && entryText != "")
+            {
+                foreach (var c in entryText)
+                {
+                    if (char.IsDigit(c) || Operation.IsOperation(c) || c.Equals(',') || c.Equals('.'))
+                    {
+
+                        text.Append(c);
+                    }
+                }
+            }
+
+            return text.ToString();
+        }
+
+        private int AddDifferentCharactersIndex(ref Entry entry, ref TextChangedEventArgs text)
+        {
             string newTextValue = text.NewTextValue;
             string oldTextValue = text.OldTextValue;
 
+            var alterText = new StringBuilder();
+
             int newTextValueLength = newTextValue?.Length != null ? newTextValue.Length : 0;
-            int oldTextValueLength = oldTextValue?.Length != null ? oldTextValue.Length : 0; 
+            int oldTextValueLength = oldTextValue?.Length != null ? oldTextValue.Length : 0;
 
 
-            for (int i = 0; i < newTextValueLength - oldTextValueLength; i++)
+            for (int i = 0; i < newTextValueLength; i++)
             {
-                string alterText = $"{oldTextValue?[..(cursorPosition - 1)]}_";
-                if (oldTextValue?.Length > cursorPosition)
-                    alterText += oldTextValue?[cursorPosition..];
-
-                oldTextValue = alterText;
+                if (i < oldTextValueLength)
+                {
+                    if (newTextValue?[i] != oldTextValue?[i])
+                        alterText.Append('_');
+                    else
+                        alterText.Append(oldTextValue?[i]);
+                }
+                else
+                    alterText.Append('_');
             }
+
+            oldTextValue = alterText.ToString();
 
             int newCharIndex = -1;
 
-            for(int i = 0; i < newTextValue.Length; i++)
+            for (int i = 0; i < newTextValue.Length; i++)
             {
                 if (newTextValue?[i] != oldTextValue?[i])
                     newCharIndex = i;
@@ -236,116 +402,76 @@ namespace CalculadoraFuncional.ViewModels
             return newCharIndex;
         }
 
-        private bool SelectWhatIsOperantioAndOperator(ref Entry entry, ref TextChangedEventArgs text)
+        private int RemoveDifferentCharactersIndex(ref Entry entry, ref TextChangedEventArgs text)
         {
+            string newTextValue = text.NewTextValue;
+            string oldTextValue = text.OldTextValue;
 
-            int indexNewChar = DifferentCharactersIndex(ref entry, ref text);
-            int operationIndex = SearchValidOperationIndex(entry.Text, 0, entry.Text.Length);
-            bool findOperationIndexOnText = operationIndex != -1;
+            var alterText = new StringBuilder();
 
-            if (!findOperationIndexOnText && !Operation.IsOperation(entry.Text[indexNewChar]))
-                return false;
-            else if (Operation.IsOperation(entry.Text[indexNewChar]) && calculator.Operation != null)
+            int newTextValueLength = newTextValue?.Length != null ? newTextValue.Length : 0;
+            int oldTextValueLength = oldTextValue?.Length != null ? oldTextValue.Length : 0;
+
+
+            for (int i = 0; i < oldTextValueLength; i++)
             {
-                if(!calculator.IsValidCalculation())
+                if (i < newTextValueLength)
                 {
-                    string textEntry = entry.Text;
-
-                    if (textEntry.Length > 0 && 
-                        Operation.IsOperation(entry.Text[indexNewChar]) && 
-                        indexNewChar != operationIndex)
-                    {
-                        entry.Text = textEntry.Remove(indexNewChar, 1);
-                    }
-
-                    return false;
-                }
-                calculator.NextOperation ??= new Operation() { OperationValue = entry.Text[indexNewChar] };
-                calculator.ProcessCalculate();
-                return true;
-            }
-            
-            if(findOperationIndexOnText)
-            {
-                if(calculator.Operator1 == null && (operationIndex+1 <= entry.Text.Length))
-                {
-                    calculator.Operator1 = new Operator() { OperatorValue = entry.Text[..operationIndex] };
-                }
-
-                if(calculator.Operator2 == null && (entry.Text.Length > operationIndex + 1)) 
-                {
-                    calculator.Operator2 = new Operator() { OperatorValue = entry.Text.Substring(operationIndex + 1) };
-                }
-               
-                if (calculator.Operator1 != null &&
-                    !calculator.Operator1.OperatorValue.Equals(entry.Text.Substring(0, operationIndex)))
-                {
-                    calculator.Operator1.OperatorValue = entry.Text.Substring(0, operationIndex);
-                }
-
-                if (calculator.Operator2 != null &&
-                    !calculator.Operator2.OperatorValue.Equals(entry.Text.Substring(operationIndex + 1)))
-                {
-                    calculator.Operator2.OperatorValue = entry.Text.Substring(operationIndex + 1);
-                }
-
-                calculator.Operation ??= new Operation() { OperationValue = entry.Text[operationIndex] };
-                
-                if(calculator.Operation != null &&
-                   !calculator.Operation.OperationValue.Equals(entry.Text[operationIndex]))
-                {
-                    calculator.Operation.OperationValue = entry.Text[operationIndex];
-                }
-            }
-            
-            if(!calculator.Expression.Equals(entry.Text))
-                calculator.Expression = entry.Text;
-
-            return true;
-        }
-
-        private int SearchValidOperationIndex(string text, int start, int end)
-        {
-            int mid = (start + end) / 2;
-
-            int result = -1;
-            if ((start + end) % 2 != 0)
-            {
-                result = SearchValidOperationIndex(text, start, mid);
-                if (result != -1)
-                    return result;
-                result = SearchValidOperationIndex(text, mid + 1, end);
-                if (result != -1)
-                    return result;
-            }
-            else
-            {
-                if (mid <= text.Length - 1)
-                {
-                    if (Operation.IsOperation(text[mid]))
-                        result = mid;
+                    if (newTextValue?[i] != oldTextValue?[i])
+                        alterText.Append('_');
                     else
-                    {
-                        result = -1;
-                    }
+                        alterText.Append(newTextValue?[i]);
                 }
                 else
-                {
-                    result = -1;
-                }
-
-                if (result == -1 && start != end)
-                {
-                    result = SearchValidOperationIndex(text, start, mid);
-                    if (result != -1)
-                        return result;
-                    result = SearchValidOperationIndex(text, mid, end);
-                    if (result != -1)
-                        return result;
-                }
+                    alterText.Append('_');
             }
 
-            return result;
+            newTextValue = alterText.ToString();
+
+            int removeCharIndex = -1;
+
+            for (int i = 0; i < newTextValue.Length; i++)
+            {
+                if (newTextValue?[i] != oldTextValue?[i])
+                    removeCharIndex = i;
+            }
+
+            return removeCharIndex;
+        }
+
+        private async Task CalculatorButtonClickTask(string text)
+        {
+            Debug.WriteLine($"Button click '{text}'");
+            this.EntryText += text;
+            OnPropertyChanged(nameof(EntryText));
+        }
+
+        private async Task DeteleButtonClickTask()
+        {
+            if (this.EntryText?.Length > 0)
+            {
+                this.EntryText = this.EntryText?.Remove(this.EntryText.Length - 1, 1);
+            }
+        }
+
+        private async Task EqualsButtonClickTask()
+        {
+            calculator?.ProcessCalculate();
+            OnPropertyChanged(nameof(EntryText));
+        }
+
+        private async Task SelectCalculationTask(Calculator select)
+        {
+            Calculator newCalculator = new();
+
+            NewCalculator(ref select, ref newCalculator, true);
+
+            foreach (IObserver<object> observer in calculator.observers)
+            {
+                observer.OnNext(newCalculator);
+            }
+
+            calculator = newCalculator;
         }
 
         public virtual void Subscribe(IObservable<object> provider)
@@ -353,7 +479,7 @@ namespace CalculadoraFuncional.ViewModels
             provider.Subscribe(this);
         }
 
-        public virtual void OnCompleted()
+        public void OnCompleted()
         {
             Calculator newCalculator = new();
 
@@ -367,9 +493,22 @@ namespace CalculadoraFuncional.ViewModels
             calculator = newCalculator;
         }
 
-        public void NewCalculator(ref Calculator oldCalculator, ref Calculator newCalculator)
+        public void OnError(Exception error)
         {
-            if (oldCalculator.CalculationCompleted)
+            throw new NotImplementedException();
+        }
+
+        public void OnNext(object value)
+        {
+            Calculator newCalculator = (Calculator)value;
+
+            if (!historyCalc.Contains(newCalculator))
+                historyCalc.Add(newCalculator);
+        }
+
+        public void NewCalculator(ref Calculator oldCalculator, ref Calculator newCalculator, bool isCloneValue = false)
+        {
+            if (oldCalculator.CalculationCompleted && !isCloneValue)
             {
                 newCalculator.Operator1 = oldCalculator.Result;
                 newCalculator.Operation = oldCalculator.NextOperation;
@@ -380,18 +519,36 @@ namespace CalculadoraFuncional.ViewModels
                     newCalculator.Subscribe(observer);
                 }
             }
+            else
+            {
+                newCalculator.Operator1 = oldCalculator.Operator1;
+                newCalculator.Operator2 = oldCalculator.Operator2;
+                newCalculator.Operation = oldCalculator.Operation;
+                newCalculator.Expression = oldCalculator.Operator1?.OperatorValue + oldCalculator.Operation?.OperationValue + oldCalculator.Operator2?.OperatorValue;
+
+                foreach (IObserver<object> observer in oldCalculator.observers)
+                {
+                    newCalculator.Subscribe(observer);
+                }
+            }
 
             Subscribe(newCalculator);
         }
-
-        public virtual void OnError(Exception error)
+        protected override void OnAttachedTo(Entry bindable)
         {
-            
+            bindable.TextChanged += on_TextChanged;
+            base.OnAttachedTo(bindable);
         }
 
-        public virtual void OnNext(object value)
+        protected override void OnDetachingFrom(Entry bindable)
         {
-            
+            bindable.TextChanged -= on_TextChanged;
+            base.OnDetachingFrom(bindable);
+        }
+
+        public void ApplyQueryAttributes(IDictionary<string, object> query)
+        {
+            throw new NotImplementedException();
         }
 
     }

@@ -14,7 +14,7 @@
             <ShellContent ContentTemplate="{DataTemplate views:NewCalculatorPage}" />
        </Tab>
         <Tab Title="Perfil" Icon="person.png">
-            <ShellContent ContentTemplate="{DataTemplate views:NewCalculatorPage}" />
+            <ShellContent ContentTemplate="{DataTemplate views:ProfilePage}" />
         </Tab>
         <Tab Title="Configurações" Icon="gear.png">
             <ShellContent ContentTemplate="{DataTemplate views:ConfigurationPage}" />

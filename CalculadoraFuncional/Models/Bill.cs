@@ -86,11 +86,11 @@ namespace CalculadoraFuncional.Models
         public static IEnumerable<Bill> LoadAll()
         {
             Random random = new Random();
-            int countOfBills = random.Next(1, 25);
+            int countOfBills = random.Next(1, 200);
 
             List<Bill> _bills = new();
             int ano, mes, dia;
-            ano = 2023;
+            ano = 2024;
 
             for (int i = 1; i <= countOfBills; i++)
             {

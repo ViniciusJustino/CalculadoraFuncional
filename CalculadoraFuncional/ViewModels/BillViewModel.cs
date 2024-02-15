@@ -8,7 +8,7 @@ namespace CalculadoraFuncional.ViewModels
 {
     internal class BillViewModel
     {
-        private Models.Bill bill;
+        public Models.Bill bill;
         public double Total;
         public string NameCategory { get; private set; }
         public DateTime Date {  get; private set; }
