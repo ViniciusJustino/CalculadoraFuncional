@@ -1,4 +1,8 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using CalculadoraFuncional.Interface;
+using CalculadoraFuncional.Services;
+using CalculadoraFuncional.ViewModels;
+using CalculadoraFuncional.Views;
+using Microsoft.Extensions.Logging;
 
 namespace CalculadoraFuncional
 {
@@ -18,6 +22,14 @@ namespace CalculadoraFuncional
 #if DEBUG
 		builder.Logging.AddDebug();
 #endif
+
+            /*builder.Services.AddSingleton<IRegisterService>();
+            builder.Services.AddSingleton<ILoginService>();*/
+
+            builder.Services.AddSingleton<FirebaseConfig>();
+
+            builder.Services.AddSingleton<LoginPage>();
+            builder.Services.AddSingleton<LoginViewModel>();
 
             return builder.Build();
         }

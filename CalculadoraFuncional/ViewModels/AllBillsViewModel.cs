@@ -13,10 +13,10 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace CalculadoraFuncional.ViewModels
 {
-    internal class AllBillsViewModel : ObservableObject
+    internal class AllBillsViewModel : BaseViewModel
     {
         public ObservableCollection<MonthlyBills> HistoryBills { get; set; }
-        
+       
         public MonthlyBills ItemBillsSelected
         {
             get => _itemSelected;

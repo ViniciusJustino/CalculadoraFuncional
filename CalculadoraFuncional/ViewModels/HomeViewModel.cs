@@ -9,7 +9,7 @@ using System.Windows.Input;
 
 namespace CalculadoraFuncional.ViewModels
 {
-    internal class HomeViewModel : ObservableObject
+    internal class HomeViewModel : BaseViewModel
     {
         public ObservableCollection<MonthlyBills> HistoryBills { get; set; }
 

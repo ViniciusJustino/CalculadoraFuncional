@@ -1,4 +1,5 @@
-﻿using CalculadoraFuncional.ViewModels;
+﻿using CalculadoraFuncional.Models;
+using CalculadoraFuncional.ViewModels;
 using System.ComponentModel;
 using System.Diagnostics;
 
@@ -6,6 +7,7 @@ namespace CalculadoraFuncional
 {
     public partial class App : Application
     {
+        public static UserDetails UserDetails;
         public App()
         {
             InitializeComponent();
@@ -68,6 +70,7 @@ namespace CalculadoraFuncional
                          ? ConfigurationViewModel.Instance.Theme.AppTheme
                          : AppTheme.Unspecified;
         }
+        
 
     }
 }

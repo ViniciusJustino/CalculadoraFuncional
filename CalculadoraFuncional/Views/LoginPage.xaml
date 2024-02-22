@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="CalculadoraFuncional.Views.LoginPage"
+             >
+
+    <Grid ColumnDefinitions="*"
+          RowDefinitions="300,*"
+          HorizontalOptions="FillAndExpand"
+          VerticalOptions="FillAndExpand"
+          BackgroundColor="White"
+          Padding="0"
+          Margin="0">
+        
+        <Border StrokeShape="RoundRectangle 0,0,180,180"
+                Background="{StaticResource Primary}"
+                Grid.Column="0"
+                Grid.Row="0"
+                Margin="0">
+            
+            <AbsoluteLayout BackgroundColor="Transparent" >
+                
+                <Image AbsoluteLayout.LayoutBounds="0.5, 0.2, 0.5, 1"
+                       AbsoluteLayout.LayoutFlags="All"
+                       Source="logo.png" Aspect="AspectFit" />
+                
+            </AbsoluteLayout>
+        </Border>
+        <StackLayout Grid.Column="0"
+                     Grid.Row="1">
+            <Label Text="Seja bem vinda(o)" FontSize="22" TextColor="Black" Margin="5"  HorizontalOptions="Center"/>
+            <Label Text="Suas compras de um jeito mais fácil!"  FontSize="Medium" TextColor="Black" Margin="0,50,0,0" LineBreakMode="WordWrap" HorizontalOptions="Center"/>
+            
+            <StackLayout VerticalOptions="CenterAndExpand">
+                
+                <Border StrokeShape="RoundRectangle 10,10,10,10"
+                        Stroke="{StaticResource Gray200}"
+                        Background="Transparent"
+                        Margin="40,0,40,10">
+
+                    <Entry ClearButtonVisibility="WhileEditing"
+                       Placeholder="Email"
+                       Text="{Binding Username}"
+                       TextColor="{StaticResource Black}"/>
+                </Border>
+
+                <Border StrokeShape="RoundRectangle 10,10,10,10"
+                        Stroke="{StaticResource Gray200}"
+                        Background="Transparent"
+                        Margin="40,10,40,0">
+
+                    <Entry ClearButtonVisibility="WhileEditing"
+                            IsPassword="True"
+                            Placeholder="Senha"
+                           Text="{Binding Password}"
+                           TextColor="Black"/>
+                </Border>
+                <Label Text="{Binding MessageErrorLogin}" IsVisible="{Binding isErrorLogin}" FontSize="12" TextColor="Red" Margin="5" HorizontalOptions="Center"/>
+            </StackLayout>
+
+            <Label Text=""/>
+
+            <Button VerticalOptions="End"
+                    HorizontalOptions="Center"
+                    Padding="20,10,20,10"
+                    BackgroundColor="{StaticResource PrimaryDark}"
+                    TextColor="{StaticResource White}"
+                    Margin="10,0,10,40"
+                    Text="Login"
+                    Command="{Binding LoginCommand}"/>
+
+
+        </StackLayout>
+    </Grid>
+</ContentPage>

@@ -12,7 +12,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 
 		<!-- Display name -->
-		<ApplicationTitle>CalculadoraFuncional</ApplicationTitle>
+		<ApplicationTitle>Calculadora Fácil</ApplicationTitle>
 
 		<!-- App Identifier -->
 		<ApplicationId>com.companyname.calculadorafuncional</ApplicationId>
@@ -32,7 +32,7 @@
 
 	<ItemGroup>
 		<!-- App Icon -->
-		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
+		<MauiIcon Include="Resources\AppIcon\calculatoricon.svg" Color="#7ABF66" BaseSize="30,30"/>
 
 		<!-- Splash Screen -->
 		<MauiSplashScreen Include="Resources\Splash\logo.svg" Color="#7ABF66" />
@@ -58,6 +58,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Remove="MainPage.xaml.cs" />
 	  <Compile Remove="ViewModels\CalculatorViewModel.cs" />
 	  <Compile Remove="ViewModels\HistoryCalculatorViewModel.cs" />
 	  <Compile Remove="Views\CalculatorPage.xaml.cs" />
@@ -66,6 +67,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <MauiXaml Remove="MainPage.xaml" />
 	  <MauiXaml Remove="Views\CalculatorPage.xaml" />
 	  <MauiXaml Remove="Views\FullCalculatorPage.xaml" />
 	</ItemGroup>
@@ -82,7 +84,9 @@
 
 	<ItemGroup>
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+		<PackageReference Include="FirebaseAuthentication.net" Version="4.1.0" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -108,6 +112,9 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\HomePage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\LoginPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\NewCalculatorPage.xaml">
