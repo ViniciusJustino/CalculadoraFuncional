@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Firebase.Auth;
+using Firebase.Auth.Repository;
+using FirebaseAdmin.Auth;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,12 +15,11 @@ namespace CalculadoraFuncional.Models
         public string Name { get; set; }
         public string RefreshToken { get; set; }
         public string Token { get; set; }
-        public string User { get; set; }
+        public UserRecord User { get; set; }
 
         public bool IsNull()
         {
             return string.IsNullOrEmpty(Id);
         }
-
     }
 }

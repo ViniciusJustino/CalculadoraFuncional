@@ -2,12 +2,14 @@
 using CalculadoraFuncional.ViewModels;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Reflection;
 
 namespace CalculadoraFuncional
 {
     public partial class App : Application
     {
         public static UserDetails UserDetails;
+        public static Stream creditialFirebase;
         public App()
         {
             InitializeComponent();
@@ -15,6 +17,11 @@ namespace CalculadoraFuncional
             MainPage = new AppShell();
 
             SetTheme();
+
+            var assembly = Assembly.GetExecutingAssembly();
+
+            string _pathCreditialFirebase = $"{assembly.GetName().Name}.Properties.calculator-app-c2l2t1-firebase-adminsdk-n77k8-561fb7d461.json";
+            creditialFirebase = assembly.GetManifestResourceStream(_pathCreditialFirebase);
 
             ConfigurationViewModel.Instance.PropertyChanged += OnSettingsPropertyChanged;
         }

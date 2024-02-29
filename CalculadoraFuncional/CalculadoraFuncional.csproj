@@ -28,11 +28,12 @@
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
 		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
+		<UserSecretsId>f2aefdcc-d224-42f5-99f6-7460a322872e</UserSecretsId>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<!-- App Icon -->
-		<MauiIcon Include="Resources\AppIcon\calculatoricon.svg" Color="#7ABF66" BaseSize="30,30"/>
+		<MauiIcon Include="Resources\AppIcon\calculatoricon.svg" Color="#7ABF66" BaseSize="30,30" />
 
 		<!-- Splash Screen -->
 		<MauiSplashScreen Include="Resources\Splash\logo.svg" Color="#7ABF66" />
@@ -73,6 +74,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Remove="Properties\calculator-app-c2l2t1-firebase-adminsdk-n77k8-561fb7d461.json" />
 	  <None Remove="Resources\Images\check.svg" />
 	  <None Remove="Resources\Images\cronometro.svg" />
 	  <None Remove="Resources\Images\cronometro_light.svg" />
@@ -83,8 +85,15 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <EmbeddedResource Include="Properties\calculator-app-c2l2t1-firebase-adminsdk-n77k8-561fb7d461.json" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+		<PackageReference Include="FirebaseAdmin" Version="2.4.0" />
 		<PackageReference Include="FirebaseAuthentication.net" Version="4.1.0" />
+		<PackageReference Include="Google.Cloud.Firestore" Version="3.5.1" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="6.0.1" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 	</ItemGroup>
@@ -121,6 +130,9 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\ProfilePage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\RegisterPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	</ItemGroup>

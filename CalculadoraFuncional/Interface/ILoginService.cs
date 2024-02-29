@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 namespace CalculadoraFuncional.Interface
 {
-    internal interface ILoginService
+    public interface ILoginService
     {
         Task<Models.UserDetails> Login(string username, string password);
+        Task<Models.UserDetails> LoginWithGoogle();
     }
 }

@@ -16,7 +16,7 @@
     <Style x:Key="borderStyle" TargetType="Border" ApplyToDerivedTypes="True">
         <Setter Property="Stroke" Value="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource Gray500}}" />
         <Setter Property="StrokeShape" Value="Rectangle"/>
-        <Setter Property="StrokeThickness" Value="2"/>
+        <Setter Property="StrokeThickness" Value="0"/>
     </Style>
 
     <Style TargetType="BoxView" ApplyToDerivedTypes="True">

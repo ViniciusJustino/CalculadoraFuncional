@@ -1,6 +1,7 @@
 ﻿using CalculadoraFuncional.Interface;
 using CalculadoraFuncional.Models;
 using CalculadoraFuncional.Services;
+using CalculadoraFuncional.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Newtonsoft.Json;
@@ -16,6 +17,9 @@ namespace CalculadoraFuncional.ViewModels
     public partial class LoginViewModel : BaseViewModel
     {
         public ICommand LoginCommand { get; private set; }
+        public ICommand RecoveryCommand { get; private set; }
+        public ICommand RegisterCommand { get; private set; }
+        public ICommand LoginGoogleCommand { get; private set; }
         [ObservableProperty]
         private string _username;
         [ObservableProperty]
@@ -30,10 +34,14 @@ namespace CalculadoraFuncional.ViewModels
         public LoginViewModel()
         {
             LoginCommand = new AsyncRelayCommand(LoginAsync);
+            RecoveryCommand = new AsyncRelayCommand(RecoveryAsync);
+            RegisterCommand = new AsyncRelayCommand(RegisterAsync);
+            LoginGoogleCommand = new AsyncRelayCommand(LoginWithGoogleAsync);
         }
-        public async Task LoginAsync()
+
+        private async Task LoginAsync()
         {
-            if(!string.IsNullOrEmpty(Username) && !string.IsNullOrEmpty(Password))
+             if(!string.IsNullOrEmpty(Username) && !string.IsNullOrEmpty(Password))
             {
                 UserDetails _userDatails = await loginService.Login(Username, Password);
 
@@ -64,6 +72,21 @@ namespace CalculadoraFuncional.ViewModels
                     MessageErrorLogin = "Senha não preenchida.";
                 }
             }
+        }
+
+        private async Task LoginWithGoogleAsync()
+        {
+            UserDetails _userDatails = await loginService.LoginWithGoogle();
+        }
+
+        private async Task RecoveryAsync()
+        {
+            string a = ".";
+        }
+
+        private async Task RegisterAsync()
+        {
+            await Shell.Current.GoToAsync(nameof(RegisterPage));
         }
     }
 }

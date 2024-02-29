@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="CalculadoraFuncional.Views.RegisterPage"
+             Title="RegisterPage">
+    <VerticalStackLayout BackgroundColor="White">
+        <Border StrokeShape="RoundRectangle 10,10,10,10"
+                Stroke="{StaticResource Gray200}"
+                Background="Transparent"
+                Margin="40,0,40,10"
+                Padding="5,0,5,0">
+
+            <Entry ClearButtonVisibility="WhileEditing"
+                   Placeholder="Email"
+                   Text="{Binding Username}"
+                   TextColor="{StaticResource Black}"/>
+        </Border>
+
+        <Border StrokeShape="RoundRectangle 10,10,10,10"
+                Stroke="{StaticResource Gray200}"
+                Background="Transparent"
+                Margin="40,10,40,0"
+                Padding="5,0,5,0">
+
+            <Entry ClearButtonVisibility="WhileEditing"
+                    IsPassword="True"
+                    Placeholder="Senha"
+                   Text="{Binding Password}"
+                   TextColor="Black"/>
+        </Border>
+        
+        <Border StrokeShape="RoundRectangle 10,10,10,10"
+                Stroke="{StaticResource Gray200}"
+                Background="Transparent"
+                Margin="40,10,40,0"
+                Padding="5,0,5,0">
+
+            <Entry ClearButtonVisibility="WhileEditing"
+                    IsPassword="True"
+                    Placeholder="Repetir Senha"
+                   Text="{Binding Repeatpassword}"
+                   TextColor="Black"/>
+        </Border>
+
+        <Border StrokeShape="RoundRectangle 10,10,10,10"
+                Stroke="{StaticResource Gray200}"
+                Background="Transparent"
+                Margin="40,10,40,0"
+                Padding="5,0,5,0">
+
+            <Entry ClearButtonVisibility="WhileEditing"
+                    Placeholder="Primeiro nome"
+                   Text="{Binding Firstname}"
+                   TextColor="Black"/>
+        </Border>
+        <Border StrokeShape="RoundRectangle 10,10,10,10"
+                Stroke="{StaticResource Gray200}"
+                Background="Transparent"
+                Margin="40,10,40,0"
+                Padding="5,0,5,0">
+
+            <Entry ClearButtonVisibility="WhileEditing"
+                    Placeholder="Sobrenome"
+                   Text="{Binding Lastname}"
+                   TextColor="Black"/>
+        </Border>
+
+        <Button VerticalOptions="End"
+                HorizontalOptions="Center"
+                Padding="20,10,20,10"
+                BackgroundColor="{StaticResource PrimaryDark}"
+                TextColor="{StaticResource White}"
+                Margin="10,0,10,40"
+                Text="Registrar"
+                Command="{Binding RegisterCommand}"/>
+    </VerticalStackLayout>
+</ContentPage>
