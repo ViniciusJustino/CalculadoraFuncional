@@ -21,6 +21,12 @@ namespace CalculadoraFuncional.ViewModels
         public ICommand RegisterCommand { get; private set; }
         public ICommand LoginGoogleCommand { get; private set; }
         [ObservableProperty]
+        private string _messageerror;
+        [ObservableProperty]
+        private string _iserror = "False";
+        [ObservableProperty]
+        private string _isrunning = "False";
+        [ObservableProperty]
         private string _username;
         [ObservableProperty]
         private string _password;
@@ -43,10 +49,22 @@ namespace CalculadoraFuncional.ViewModels
         {
              if(!string.IsNullOrEmpty(Username) && !string.IsNullOrEmpty(Password))
             {
+                Isrunning = "True";
                 UserDetails _userDatails = await loginService.Login(Username, Password);
 
                 if (_userDatails.IsNull())
+                {
+                    if (Connectivity.Current.NetworkAccess == NetworkAccess.Unknown)
+                        Messageerror = "Acesso a internet indefinido.";
+                    else if (Connectivity.Current.NetworkAccess == NetworkAccess.None)
+                        Messageerror = "Sem conexão a internet.";
+                    else
+                        Messageerror = "Erro ao registrar o usuário.";
+
+                    Iserror = "True";
+                    Isrunning = "False";
                     return;
+                }
 
                 if (Preferences.ContainsKey(nameof(App.UserDetails)))
                 {
@@ -59,6 +77,7 @@ namespace CalculadoraFuncional.ViewModels
 
                 App.UserDetails = _userDatails;
 
+                Isrunning = "False";
                 await Shell.Current.GoToAsync("//app");
             }
             else

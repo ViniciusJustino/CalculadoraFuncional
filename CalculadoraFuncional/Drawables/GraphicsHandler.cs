@@ -10,7 +10,7 @@ using System.Globalization;
 
 namespace CalculadoraFuncional.Drawables
 {
-    internal class GraphicsHandler: IDrawable
+    public class GraphicsHandler: IDrawable
     {
         public string Width { get; set; }
         private int widthColumns { get; } = 50;
@@ -25,10 +25,12 @@ namespace CalculadoraFuncional.Drawables
         {
             ComputedColumnsForDraw(ref _bills);
 
-            bills = _bills.ToList();
+            bills = _bills?.ToList();
         }
         public void Draw(ICanvas canvas, RectF dirtyRect)
         {
+            if (bills == null)
+                return;
 
             DrawCartesianLines(ref canvas);
             DrawColumns(ref canvas, bills);
@@ -113,7 +115,8 @@ namespace CalculadoraFuncional.Drawables
              *  column height = (240) * value / Max;
              *  xPosition = (iterator * 50) + 5
              */
-
+            if (_bills == null)
+                return;
             
             this.Max = _bills.MaxBy(maxValue => maxValue.Value).Value;
             this.Width = ((_bills.Count() * spacingBetweenColumns) + (_bills.Count() * widthColumns) + marginCartesianLines).ToString();

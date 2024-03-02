@@ -3,7 +3,7 @@
 
 namespace CalculadoraFuncional.Models
 {
-    internal class MonthlyBills
+    public class MonthlyBills
     {
         public List<BillViewModel> _bills;
         public string Month { get; set; }

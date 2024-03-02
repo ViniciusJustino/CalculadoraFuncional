@@ -9,7 +9,7 @@ using System.Windows.Input;
 
 namespace CalculadoraFuncional.ViewModels
 {
-    internal class HomeViewModel : BaseViewModel
+    public partial class HomeViewModel : BaseViewModel
     {
         public ObservableCollection<MonthlyBills> HistoryBills { get; set; }
 
@@ -29,6 +29,11 @@ namespace CalculadoraFuncional.ViewModels
                     OnPropertyChanged(nameof(this.ItemBillsSelected));
 
                     IEnumerable<Bill> _bills = _itemSelected.Bills.Select(billViewModel => billViewModel.bill);
+
+                    MaxValue = _bills.MaxBy(maxValue => maxValue.Value).Value;
+
+                    OnPropertyChanged(nameof(this.MaxValue));
+
                     _ = LoadGraphicsAsync(_bills);
                 }
             }
@@ -36,6 +41,7 @@ namespace CalculadoraFuncional.ViewModels
         public Drawables.GraphicsHandler GraphicsHandler { get; private set; }
         public ICommand RefreshCommand { get; private set; }
         public bool IsRefreshing { get; set; }
+        public double MaxValue { get; set; }
         private int MonthSelected { get; set; }
         private int YearSelected { get; set; }
         private MonthlyBills _itemSelected;
@@ -81,7 +87,7 @@ namespace CalculadoraFuncional.ViewModels
 
         private async Task LoadListBillsAsync(IEnumerable<Bill> _bills)
         {
-            await Task.Delay(800);
+            
             ObservableCollection<BillViewModel> tempHistoryBills = new ObservableCollection<BillViewModel>(_bills.Select(n => new BillViewModel(n)));
 
             var grouped = tempHistoryBills
@@ -95,7 +101,6 @@ namespace CalculadoraFuncional.ViewModels
 
         private async Task LoadGraphicsAsync(IEnumerable<Bill> _bills)
         {
-            await Task.Delay(1500);
             IEnumerable<Bill> groupedGraphic = _bills.Where(b => b.Date.Month == MonthSelected && b.Date.Year == YearSelected);
             this.GraphicsHandler = new Drawables.GraphicsHandler(ref groupedGraphic);
 
@@ -104,7 +109,9 @@ namespace CalculadoraFuncional.ViewModels
 
         private async ValueTask<IEnumerable<Bill>> LoadBillsAsync()
         {
-            return Models.Bill.LoadAll().OrderBy(b => b.Date);
+            var _bills = await Models.Bill.LoadAllAsync();
+
+            return _bills.OrderBy(b => b.Date);
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿using CalculadoraFuncional.Models;
+﻿using CalculadoraFuncional.Interface;
+using CalculadoraFuncional.Models;
+using CalculadoraFuncional.Services;
 using CalculadoraFuncional.ViewModels;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -8,8 +10,22 @@ namespace CalculadoraFuncional
 {
     public partial class App : Application
     {
-        public static UserDetails UserDetails;
+        private static UserDetails _userDetails;
+        public static UserDetails UserDetails 
+        { 
+            get { return _userDetails; } 
+            set 
+            { 
+                if(value != null)
+                {
+                    _userDetails = value;
+                    ConnectDatabase(_userDetails);
+                }
+                 
+            }
+        }
         public static Stream creditialFirebase;
+        public static IHandlerDatabase database = new FirestoreService();
         public App()
         {
             InitializeComponent();
@@ -78,6 +94,10 @@ namespace CalculadoraFuncional
                          : AppTheme.Unspecified;
         }
         
+        private static async void ConnectDatabase(UserDetails _user)
+        {
+            database = await database.CreateIntanceWithCredentialAsync(_user);
+        }
 
     }
 }

@@ -6,9 +6,6 @@
              xmlns:drawables="clr-namespace:CalculadoraFuncional.Drawables"
              xmlns:viewModels="clr-namespace:CalculadoraFuncional.ViewModels"
              Title="Home">
-    <ContentPage.BindingContext>
-        <viewModels:HomeViewModel />
-    </ContentPage.BindingContext>
 
 
     <ScrollView VerticalScrollBarVisibility="Never">
@@ -17,18 +14,20 @@
                        Text="Home"
                        VerticalOptions="Center" 
                        HorizontalOptions="Center" />
-            <ScrollView FlowDirection="LeftToRight"
-                        Orientation="Horizontal"
-                        HorizontalScrollBarVisibility="Always"
-                        VerticalOptions="Fill"
-                        HorizontalOptions="CenterAndExpand"
-                        Grid.Row="1" Grid.Column="0">
-                <GraphicsView x:Name="graphicView"
-                              HeightRequest="300" 
-                              Drawable="{Binding GraphicsHandler}"
-                              WidthRequest="{Binding GraphicsHandler.Width}"
-                              Margin="5"/>
-            </ScrollView>
+            <HorizontalStackLayout Grid.Row="1" Grid.Column="0">
+                <Label Margin="3" Text="{Binding MaxValue}" HorizontalOptions="Start" VerticalOptions="Start"/>
+                <ScrollView FlowDirection="LeftToRight"
+                            Orientation="Horizontal"
+                            HorizontalScrollBarVisibility="Always"
+                            VerticalOptions="Fill"
+                            HorizontalOptions="CenterAndExpand">
+                    <GraphicsView x:Name="graphicView"
+                                  HeightRequest="300" 
+                                  Drawable="{Binding GraphicsHandler}"
+                                  WidthRequest="{Binding GraphicsHandler.Width}"
+                                  Margin="5"/>
+                </ScrollView>
+            </HorizontalStackLayout>
             <Border Grid.Row="2" Grid.Column="0"
                     StrokeShape="RoundRectangle 10,10,10,10"
                     VerticalOptions="FillAndExpand"

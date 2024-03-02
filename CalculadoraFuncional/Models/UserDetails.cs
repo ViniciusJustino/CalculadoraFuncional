@@ -11,6 +11,7 @@ namespace CalculadoraFuncional.Models
 {
     public partial class UserDetails
     {
+       
         public string Id { get; set; }
         public string Name { get; set; }
         public string RefreshToken { get; set; }

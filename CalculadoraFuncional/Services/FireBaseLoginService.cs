@@ -3,6 +3,9 @@ using CalculadoraFuncional.Models;
 using Firebase.Auth;
 using Firebase.Auth.Providers;
 using Firebase.Auth.Repository;
+using FirebaseAdmin;
+using FirebaseAdmin.Auth;
+using Google.Apis.Auth.OAuth2;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,8 +21,6 @@ namespace CalculadoraFuncional.Services
         {
 
             var config = FirebaseAuthConfig();
-
-            
             var client = new FirebaseAuthClient(config);
 
             try
@@ -29,16 +30,20 @@ namespace CalculadoraFuncional.Services
                     var userCredential = await client.SignInWithEmailAndPasswordAsync(username, password);
                     var user = userCredential.User;
 
-                    var refreshToken = user.Credential.RefreshToken; // more properties are available in user.Credential
-                    var token = user.GetIdTokenAsync();
+                    var refreshToken = user.Credential.RefreshToken;
+                    string token = await user.GetIdTokenAsync();
+
+                    FirebaseAuth auth = FirebaseAuth.GetAuth( FirebaseConfig.FirebaseAppServicesInit());
+
+                    UserRecord _user = await auth.GetUserAsync(user.Uid);
 
                     return await Task.FromResult(new UserDetails
                     {
-                        Name = user.Info.FirstName,
-                        Id = user.Uid,
-                        Token = await user.GetIdTokenAsync(),
-                        RefreshToken = user.Credential.RefreshToken
-
+                        Name = _user.DisplayName,
+                        Id = _user.Uid,
+                        Token = token,
+                        RefreshToken = user.Credential.RefreshToken,
+                        User = _user
                     });
                 }
                 else
@@ -47,9 +52,13 @@ namespace CalculadoraFuncional.Services
                 }
 
             }
-            catch(Exception ex)
+            catch(ArgumentNullException ex)
             {
-
+                await App.Current.MainPage.DisplayAlert("Login Error", $"Erro ao autenticar-se com a base de dados: {ex.Message}", "OK");
+            }
+            catch (ArgumentException ex)
+            {
+                await App.Current.MainPage.DisplayAlert("Login Error", $"Erro ao acessar dados do usuário: {ex.Message}", "OK");
             }
 
             return await Task.FromResult(new UserDetails());
@@ -58,7 +67,7 @@ namespace CalculadoraFuncional.Services
         public async Task<UserDetails> LoginWithGoogle()
         {
             //NOT WORK!!!
-            var config = FirebaseAuthConfig();
+            /*var config = FirebaseAuthConfig();
 
 
             var client = new FirebaseAuthClient(config);
@@ -95,14 +104,14 @@ namespace CalculadoraFuncional.Services
             catch (Exception ex)
             {
 
-            }
+            }*/
 
             return await Task.FromResult(new UserDetails());
         }
 
         private async Task<string> OpenBrowser(string url)
         {
-            try
+           /* try
             {
                 Uri Url = new Uri(url);
                 Uri UriCallback = new Uri($"https://{HandleAuthDomainGoogle}");
@@ -117,7 +126,7 @@ namespace CalculadoraFuncional.Services
             } catch(Exception e)
             {
                 App.Current.MainPage.DisplayAlert("Falha de Login", e.Message, "OK");
-            }
+            }*/
             return null;
         }
 

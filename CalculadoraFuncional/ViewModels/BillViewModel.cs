@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CalculadoraFuncional.ViewModels
 {
-    internal class BillViewModel
+    public class BillViewModel
     {
         public Models.Bill bill;
         public double Total;
@@ -17,7 +17,7 @@ namespace CalculadoraFuncional.ViewModels
         public BillViewModel(Models.Bill _bill)
         {
             bill = _bill;
-            NameCategory = _bill.Category.NameCategory;
+            NameCategory = _bill?.Category?.NameCategory;
             Total = _bill.Value;
             Date = _bill.Date;
             Name = _bill.Name;

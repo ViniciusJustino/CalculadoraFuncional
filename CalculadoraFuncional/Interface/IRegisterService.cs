@@ -19,6 +19,5 @@ namespace CalculadoraFuncional.Interface
         IRegisterService CreatePassword(string password);
 
         Task<Models.UserDetails> RegisterAsync();
-        Task<Models.UserDetails> Register(string username, string password, string name);
     }
 }

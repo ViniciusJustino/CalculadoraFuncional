@@ -1,6 +1,7 @@
 ﻿using CalculadoraFuncional.Interface;
 using CalculadoraFuncional.Models;
 using Firebase.Auth;
+using FirebaseAdmin;
 using FirebaseAdmin.Auth;
 using System;
 using System.Collections.Generic;
@@ -81,10 +82,10 @@ namespace CalculadoraFuncional.Services
             {
                 if (Connectivity.Current.NetworkAccess == NetworkAccess.Internet)
                 {
-                    var credential = FirebaseConfig.FirebaseAppServicesInit();
+                    FirebaseApp credential = FirebaseConfig.FirebaseAppServicesInit();
                     var defaultAuth = FirebaseAuth.GetAuth(credential);
 
-                    if (defaultAuth != null) 
+                    if (defaultAuth != null)
                     {
                         UserRecord user = await defaultAuth.CreateUserAsync(new UserRecordArgs()
                         {
@@ -94,27 +95,44 @@ namespace CalculadoraFuncional.Services
                             Password = _password,
                             Disabled = false,
                             DisplayName = _firstName
-                        }) ;
+                        });
 
-                        return new UserDetails()
-                        { 
+
+                        UserDetails userDetails = new UserDetails()
+                        {
                             Id = user.Uid,
                             Name = user.DisplayName,
+                            Token = await defaultAuth.CreateCustomTokenAsync(user.Uid),
                             User = user
                         };
+
+                        return userDetails;
+
                     }
+
                 }
-
+                else
+                {
+                    return null;
+                }
             }
-            catch (Exception ex)
+            catch (ArgumentNullException ex)
             {
-
+                await App.Current.MainPage.DisplayAlert("Register Error", $"Erro ao autenticar-se com a base de dados: {ex.Message}", "OK");
+            }
+            catch(InvalidOperationException ex)
+            {
+                await App.Current.MainPage.DisplayAlert("Register Error", $"Erro ao registrar token de acesso: {ex.Message}", "OK");
+            }
+            catch (ArgumentException ex)
+            {
+                await App.Current.MainPage.DisplayAlert("Register Error", $"Erro ao registrar token de acesso: {ex.Message}", "OK");
+            }
+            catch (FirebaseAdmin.Auth.FirebaseAuthException ex)
+            {
+                await App.Current.MainPage.DisplayAlert($"Register Error {ex.ErrorCode}", $"Erro ao registrar dados do usuário: {ex.Message}", "OK");
             }
 
-            return await Task.FromResult(new UserDetails());
-        }
-        public async Task<UserDetails> Register(string username, string password, string name)
-        {
             return await Task.FromResult(new UserDetails());
         }
     }

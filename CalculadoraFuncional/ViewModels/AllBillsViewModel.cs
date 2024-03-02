@@ -105,7 +105,8 @@ namespace CalculadoraFuncional.ViewModels
 
         private async ValueTask<IEnumerable<Bill>> LoadBillsAsync()
         {
-            return Models.Bill.LoadAll().OrderBy(b => b.Date);
+            var result = await Models.Bill.LoadAllAsync();
+            return result.OrderBy(b => b.Date);
         }
 
     }
