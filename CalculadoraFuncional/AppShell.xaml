@@ -6,9 +6,8 @@
     xmlns:views="clr-namespace:CalculadoraFuncional.Views"
     xmlns:local="clr-namespace:CalculadoraFuncional">
 
-    <ShellContent ContentTemplate="{DataTemplate views:LoginPage}"
-                  Shell.NavBarIsVisible="False"
-                  Route="LoginPage"/> 
+    <!--<ShellContent ContentTemplate="{DataTemplate views:LoginPage}"
+                  Route="LoginPage"/>--> 
     
     <TabBar Route="app" >
         <Tab Title="Home" Icon="house.png">

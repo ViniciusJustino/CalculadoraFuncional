@@ -64,6 +64,45 @@ namespace CalculadoraFuncional.Services
             return await Task.FromResult(new UserDetails());
         }
 
+        public async Task<UserDetails> LoginWithToken(string token)
+        {
+
+            try
+            {
+                if (Connectivity.Current.NetworkAccess == NetworkAccess.Internet)
+                {
+
+                    FirebaseApp credential = FirebaseConfig.FirebaseAppServicesInit();
+                    FirebaseAuth defaultAuth = FirebaseAuth.GetAuth(credential);
+                    FirebaseToken decodedToken = await defaultAuth.VerifyIdTokenAsync(token);
+                    var _user = await defaultAuth.GetUserAsync(decodedToken.Uid);
+
+                    return await Task.FromResult(new UserDetails
+                     {
+                         Name = _user.DisplayName,
+                         Id = _user.Uid,
+                         Token = token,
+                         User = _user
+                     });
+                }
+                else
+                {
+                    return null;
+                }
+
+            }
+            catch (ArgumentNullException ex)
+            {
+                await App.Current.MainPage.DisplayAlert("Login Error", $"Erro ao autenticar-se com a base de dados: {ex.Message}", "OK");
+            }
+            catch (ArgumentException ex)
+            {
+                await App.Current.MainPage.DisplayAlert("Login Error", $"Erro ao acessar dados do usuário: {ex.Message}", "OK");
+            }
+
+            return await Task.FromResult(new UserDetails());
+        }
+
         public async Task<UserDetails> LoginWithGoogle()
         {
             //NOT WORK!!!

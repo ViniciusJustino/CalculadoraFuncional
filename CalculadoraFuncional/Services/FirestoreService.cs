@@ -39,26 +39,20 @@ namespace CalculadoraFuncional.Services
                 Credential = GoogleCredential.FromAccessToken(user.Token)
             };
 
-            
             firebaseDb = FirestoreDb.Create(
                 projectId: FirebaseConfig.ProjectId,
                 client: client.Build()
             );
-
 
             return this;
         }
         public async ValueTask<IEnumerable<Bill>> GetAllBills(UserDetails _user)
         {
             List<Bill> _bills = new();
-            Dictionary<string, object> docDataEmpity = new Dictionary<string, object>
-            {
-
-            };
+            Dictionary<string, object> docDataEmpity = new Dictionary<string, object>{};
 
             DocumentReference bills = firebaseDb.Collection("bills").Document(_user.Id);
             DocumentSnapshot billsSnapshot = await bills.GetSnapshotAsync();
-
 
             if (!billsSnapshot.Exists)
             {
@@ -99,8 +93,6 @@ namespace CalculadoraFuncional.Services
                         Timestamp timestamp = (Timestamp)pair.Value;
                         _bill.GetType().GetProperty(pair.Key)?.SetValue(_bill, timestamp.ToDateTime(), null);
                     }
-                    
-                    
                 }
 
                 _bills.Add(_bill);

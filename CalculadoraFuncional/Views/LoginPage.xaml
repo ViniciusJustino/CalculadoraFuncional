@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="CalculadoraFuncional.Views.LoginPage"
              >
-
+   
     <Grid ColumnDefinitions="*"
           RowDefinitions="50,300,*"
           HorizontalOptions="FillAndExpand"
@@ -21,7 +21,6 @@
                 Grid.Column="0"
                 Grid.Row="1"
                 Margin="0">
-            
             
             <AbsoluteLayout BackgroundColor="Transparent" >
                 
@@ -63,12 +62,12 @@
                            TextColor="Black"/>
                 </Border>
                 <HorizontalStackLayout FlowDirection="RightToLeft" Padding="40,0,0,0">
-                    <CheckBox x:Name="checkBox" Color="{StaticResource Primary}" />
+                    <CheckBox x:Name="checkBox" Color="{StaticResource Primary}" IsChecked="{Binding IsCheck}"/>
                     <Label Text="Mantenha-me conectado" TextColor="Black" VerticalOptions="Center">
                         <Label.Triggers>
                             <DataTrigger TargetType="Label"
                                          Binding="{Binding Source={x:Reference checkBox}, Path=IsChecked}"
-                                         Value="true">
+                                         Value="True">
                                 <Setter Property="FontAttributes" Value="Italic, Bold" />
                             </DataTrigger>
                         </Label.Triggers>

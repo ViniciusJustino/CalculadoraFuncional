@@ -20,21 +20,9 @@ namespace CalculadoraFuncional.ViewModels
             {
                 if (_itemSelected != value && value != null)
                 {
-                    _itemSelected = value;
-
-                    MonthSelected = _itemSelected.MonthNumber;
-                    YearSelected = _itemSelected.Year;
+                    SelectItem(value);
                     ItemBillsSelected = null;
 
-                    OnPropertyChanged(nameof(this.ItemBillsSelected));
-
-                    IEnumerable<Bill> _bills = _itemSelected.Bills.Select(billViewModel => billViewModel.bill);
-
-                    MaxValue = _bills.MaxBy(maxValue => maxValue.Value).Value;
-
-                    OnPropertyChanged(nameof(this.MaxValue));
-
-                    _ = LoadGraphicsAsync(_bills);
                 }
             }
         }
@@ -112,6 +100,24 @@ namespace CalculadoraFuncional.ViewModels
             var _bills = await Models.Bill.LoadAllAsync();
 
             return _bills.OrderBy(b => b.Date);
+        }
+
+        private void SelectItem(MonthlyBills value)
+        {
+            _itemSelected = value;
+
+            MonthSelected = _itemSelected.MonthNumber;
+            YearSelected = _itemSelected.Year;
+
+            OnPropertyChanged(nameof(this.ItemBillsSelected));
+
+            IEnumerable<Bill> _bills = _itemSelected.Bills.Select(billViewModel => billViewModel.bill);
+
+            MaxValue = _bills.MaxBy(maxValue => maxValue.Value).Value;
+
+            OnPropertyChanged(nameof(this.MaxValue));
+
+            _ = LoadGraphicsAsync(_bills);
         }
     }
 }

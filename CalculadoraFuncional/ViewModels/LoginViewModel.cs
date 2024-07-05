@@ -34,6 +34,8 @@ namespace CalculadoraFuncional.ViewModels
         private string _messageErrorLogin;
         [ObservableProperty]
         private bool _isErrorLogin;
+        [ObservableProperty]
+        private bool _isCheck;
         readonly ILoginService loginService = new FireBaseLoginService();
 
 
@@ -43,6 +45,9 @@ namespace CalculadoraFuncional.ViewModels
             RecoveryCommand = new AsyncRelayCommand(RecoveryAsync);
             RegisterCommand = new AsyncRelayCommand(RegisterAsync);
             LoginGoogleCommand = new AsyncRelayCommand(LoginWithGoogleAsync);
+            IsCheck = Preferences.Default.Get("direct_login", false);
+
+            IsDirectLoginAsync();
         }
 
         private async Task LoginAsync()
@@ -59,26 +64,14 @@ namespace CalculadoraFuncional.ViewModels
                     else if (Connectivity.Current.NetworkAccess == NetworkAccess.None)
                         Messageerror = "Sem conexão a internet.";
                     else
-                        Messageerror = "Erro ao registrar o usuário.";
+                        Messageerror = "Erro ao logar o usuário.";
 
                     Iserror = "True";
                     Isrunning = "False";
                     return;
                 }
 
-                if (Preferences.ContainsKey(nameof(App.UserDetails)))
-                {
-                    Preferences.Remove(nameof(App.UserDetails));
-                }
-
-                string userDatails = JsonConvert.SerializeObject(_userDatails);
-
-                Preferences.Set(nameof(App.UserDetails), userDatails);
-
-                App.UserDetails = _userDatails;
-
-                Isrunning = "False";
-                await Shell.Current.GoToAsync("//app");
+                AccessAppAsync(_userDatails);
             }
             else
             {
@@ -93,9 +86,57 @@ namespace CalculadoraFuncional.ViewModels
             }
         }
 
+        private async Task LoginWithTokenAsync(string _token)
+        {
+            if (_token != null && _token != "")
+            {
+                UserDetails _userDatails = await loginService.LoginWithToken(_token);
+
+                if (_userDatails.IsNull())
+                {
+                    if (Connectivity.Current.NetworkAccess == NetworkAccess.Unknown)
+                        Messageerror = "Acesso a internet indefinido.";
+                    else if (Connectivity.Current.NetworkAccess == NetworkAccess.None)
+                        Messageerror = "Sem conexão a internet.";
+                    else
+                        Messageerror = "Erro ao logar o usuário.";
+
+                    Iserror = "True";
+                    Isrunning = "False";
+                    return;
+                }
+
+                AccessAppAsync(_userDatails);
+            }
+            else
+            {
+                if (string.IsNullOrEmpty(Username))
+                {
+                    MessageErrorLogin = string.IsNullOrEmpty(Password) ? "Usuário e senha não preenchidos." : "Usuário não preenchido.";
+                }
+                else if (string.IsNullOrEmpty(Password))
+                {
+                    MessageErrorLogin = "Senha não preenchida.";
+                }
+            }
+        }
+
         private async Task LoginWithGoogleAsync()
         {
             UserDetails _userDatails = await loginService.LoginWithGoogle();
+        }
+
+        private async void IsDirectLoginAsync()
+        {
+            if (IsCheck)
+            {
+                string oauthToken = await SecureStorage.Default.GetAsync("token_access");
+
+                if (oauthToken != null)
+                {
+                    //_ = LoginWithTokenAsync(oauthToken);
+                }
+            }
         }
 
         private async Task RecoveryAsync()
@@ -106,6 +147,31 @@ namespace CalculadoraFuncional.ViewModels
         private async Task RegisterAsync()
         {
             await Shell.Current.GoToAsync(nameof(RegisterPage));
+        }
+
+        private async void AccessAppAsync(UserDetails _userDatails)
+        {
+            if (Preferences.ContainsKey(nameof(App.UserDetails)))
+            {
+                Preferences.Remove(nameof(App.UserDetails));
+            }
+
+            string userDatails = JsonConvert.SerializeObject(_userDatails);
+
+            Preferences.Set(nameof(App.UserDetails), userDatails);
+
+            App.UserDetails = _userDatails;
+
+            if (IsCheck)
+            {
+                await SecureStorage.Default.SetAsync("token_access", _userDatails.Token);
+                Preferences.Default.Set("direct_login", true);
+            }
+
+            App.isBusy = true;
+
+            Isrunning = "False";
+            await Shell.Current.GoToAsync("//app");
         }
     }
 }

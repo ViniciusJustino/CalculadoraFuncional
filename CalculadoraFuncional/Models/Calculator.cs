@@ -1,8 +1,10 @@
 ﻿
 using CommunityToolkit.Mvvm.ComponentModel;
+using SQLite;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
@@ -12,20 +14,32 @@ using System.Threading.Tasks;
 
 namespace CalculadoraFuncional.Models
 {
+    
     internal class Calculator : ObservableObject, IObservable<object>
     {
         public List<IObserver<object>> observers = new();
+
+        [MaxLength(10)]
         public Operator Operator1 { get; set; }
+
+        [MaxLength(10)]
         public Operator Operator2 { get; set; }
+
+        [MaxLength(10)]
         public Operator Result { get; set; }
+
+        [MaxLength(1)]
         public Operation Operation { get; set; }
+
+        [MaxLength(1)]
         public Operation NextOperation { get; set; }
+
         public bool CalculationCompleted { get; set; }
 
-        //public event PropertyChangedEventHandler PropertyChanged;
-        private string _expression;
         
-       
+        private string _expression;
+
+        [MaxLength(50)]
         public string Expression
          { 
              get => _expression;
@@ -33,7 +47,6 @@ namespace CalculadoraFuncional.Models
              {
                  _expression = value;
                  OnPropertyChanged(nameof(Expression));
-                 //PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Expression"));
              } 
          }
 
@@ -46,8 +59,15 @@ namespace CalculadoraFuncional.Models
             { '÷', (a, b) => a / b }
         };
 
-        public string Id { get; set; }
-        public Calculator() { Id = new Random().Next().ToString(); }
+        [PrimaryKey, AutoIncrement]
+        public int Id { get; set; }
+
+        public int IdBill { get; set; }
+
+        public Calculator() 
+        {
+
+        }
 
         public IDisposable Subscribe(IObserver<object> observer)
         {

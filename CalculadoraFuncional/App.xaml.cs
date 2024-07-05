@@ -25,19 +25,23 @@ namespace CalculadoraFuncional
             }
         }
         public static Stream creditialFirebase;
+        public static bool isBusy;
         public static IHandlerDatabase database = new FirestoreService();
+        public static LocalDatabaseSQLite localDatabase = new LocalDatabaseSQLite();
         public App()
         {
+            var assembly = Assembly.GetExecutingAssembly();
+
+            string _pathCreditialFirebase = $"{assembly.GetName().Name}.Properties.calculator-app-c2l2t1-firebase-adminsdk-n77k8-561fb7d461.json";
+            creditialFirebase = assembly.GetManifestResourceStream(_pathCreditialFirebase);
+
+            _ = localDatabase.Init();
+
             InitializeComponent();
 
             MainPage = new AppShell();
 
             SetTheme();
-
-            var assembly = Assembly.GetExecutingAssembly();
-
-            string _pathCreditialFirebase = $"{assembly.GetName().Name}.Properties.calculator-app-c2l2t1-firebase-adminsdk-n77k8-561fb7d461.json";
-            creditialFirebase = assembly.GetManifestResourceStream(_pathCreditialFirebase);
 
             ConfigurationViewModel.Instance.PropertyChanged += OnSettingsPropertyChanged;
         }

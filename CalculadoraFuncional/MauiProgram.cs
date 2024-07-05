@@ -27,6 +27,7 @@ namespace CalculadoraFuncional
             builder.Services.AddSingleton<ILoginService>();*/
 
             builder.Services.AddSingleton<FirebaseConfig>();
+            builder.Services.AddSingleton<LocalDatabaseSQLite>();
 
             builder.Services.AddSingleton<LoginPage>();
             builder.Services.AddSingleton<LoginViewModel>();

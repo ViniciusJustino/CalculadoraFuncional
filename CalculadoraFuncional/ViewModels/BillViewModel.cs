@@ -17,7 +17,7 @@ namespace CalculadoraFuncional.ViewModels
         public BillViewModel(Models.Bill _bill)
         {
             bill = _bill;
-            NameCategory = _bill?.Category?.NameCategory;
+            //NameCategory = _bill?.Category?.NameCategory;
             Total = _bill.Value;
             Date = _bill.Date;
             Name = _bill.Name;

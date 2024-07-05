@@ -12,6 +12,7 @@ using CommunityToolkit.Mvvm.Input;
 using System.Linq.Expressions;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
+using Microsoft.Maui.Controls.Compatibility;
 
 namespace CalculadoraFuncional.ViewModels
 {
@@ -19,6 +20,7 @@ namespace CalculadoraFuncional.ViewModels
     {
         //Properties definition
         private Calculator _calculator;
+        private Bill _bill;
         public Calculator calculator
         {
             get { return _calculator; }
@@ -67,6 +69,8 @@ namespace CalculadoraFuncional.ViewModels
             DeteleButtonClickCommmand = new AsyncRelayCommand(DeteleButtonClickTask);
             EqualsButtonClickCommmand = new AsyncRelayCommand(EqualsButtonClickTask);
             SelectCalculationCommand = new AsyncRelayCommand<Calculator>(SelectCalculationTask);
+
+            Init();
 
             historyCalc.Add(calculator);
             Subscribe(calculator);
@@ -481,6 +485,10 @@ namespace CalculadoraFuncional.ViewModels
         public void OnCompleted()
         {
             Calculator newCalculator = new();
+            newCalculator.IdBill = _bill.Id;
+
+            _bill.Value = Convert.ToDouble(_calculator.Result.OperatorValue);
+            _= App.localDatabase.UpdateBillAsync(_bill);
 
             NewCalculator(ref _calculator, ref newCalculator);
 
@@ -548,6 +556,16 @@ namespace CalculadoraFuncional.ViewModels
         public void ApplyQueryAttributes(IDictionary<string, object> query)
         {
             throw new NotImplementedException();
+        }
+
+        private async void Init()
+        {
+            Random rng = new Random();
+            string name = rng.Next().ToString();
+
+            await App.localDatabase.AddBill(new Bill() { Name = name });
+
+            //_bill = await App.localDatabase.GetBillAsync(name)
         }
     }
 }

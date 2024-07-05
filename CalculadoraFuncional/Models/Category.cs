@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CalculadoraFuncional.Models
 {
-    public static class Categories
+    /*public static class Categories
     {
         public static List<Category> ListCategories { get; private set; } 
         
@@ -40,16 +40,10 @@ namespace CalculadoraFuncional.Models
         {
             return ListCategories.Find(category => category.Id == _category.Id);
         }
-    }
+    }*/
     public class Category
     {
-        public int Id { get; }
-        public string NameCategory { get; }
-
-        public Category(int id, string nameCategory)
-        {
-            Id = id;
-            NameCategory = nameCategory;
-        }
+        public int Id { get; set;  }
+        public string NameCategory { get; set; }
     }
 }

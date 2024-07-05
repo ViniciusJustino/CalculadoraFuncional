@@ -10,5 +10,6 @@ namespace CalculadoraFuncional.Interface
     {
         Task<Models.UserDetails> Login(string username, string password);
         Task<Models.UserDetails> LoginWithGoogle();
+        Task<Models.UserDetails> LoginWithToken(string token);
     }
 }
