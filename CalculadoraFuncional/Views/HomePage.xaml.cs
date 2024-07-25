@@ -15,20 +15,11 @@ public partial class HomePage : ContentPage
 
     }
 
-    /*protected override void OnDisappearing()
-    {
-		base.OnDisappearing();
-
-        NewDrawable dr =  new NewDrawable();
-        graphicView.WidthRequest = dr.Width;
-        graphicView.Drawable = dr;
-    }*/
-
     protected override void OnAppearing()
     {
         base.OnAppearing();
         Debug.WriteLine("HomePage Ativo");
-        //graphicView.Invalidate();
+        ((HomeViewModel) BindingContext).RefreshCommand.Execute(this);
     }
 
     protected override void OnDisappearing()

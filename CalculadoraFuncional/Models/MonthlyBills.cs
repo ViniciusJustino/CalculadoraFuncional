@@ -1,4 +1,5 @@
 ﻿using CalculadoraFuncional.ViewModels;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 
 namespace CalculadoraFuncional.Models
@@ -10,6 +11,7 @@ namespace CalculadoraFuncional.Models
         public int MonthNumber { get; set; }
         public int Year { get; set; }
         public string Total { get; set; }
+        public bool IsSelected {  get; set; }
         public List<BillViewModel> Bills
         {
             get => _bills;

@@ -76,11 +76,16 @@
 
 	<ItemGroup>
 	  <None Remove="Properties\calculator-app-c2l2t1-firebase-adminsdk-n77k8-561fb7d461.json" />
+	  <None Remove="Resources\Images\arrow_right.svg" />
+	  <None Remove="Resources\Images\arrow_right_light.svg" />
 	  <None Remove="Resources\Images\check.svg" />
 	  <None Remove="Resources\Images\cronometro.svg" />
 	  <None Remove="Resources\Images\cronometro_light.svg" />
 	  <None Remove="Resources\Images\delete.svg" />
+	  <None Remove="Resources\Images\list.svg" />
 	  <None Remove="Resources\Images\plus.svg" />
+	  <None Remove="Resources\Images\trash.svg" />
+	  <None Remove="Resources\Images\trash_light.svg" />
 	  <None Remove="Resources\Images\xmark.svg" />
 	  <None Remove="Resources\Raw\Configurations.json" />
 	</ItemGroup>
@@ -108,6 +113,12 @@
 	  <Compile Update="MauiProgram.cs">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </Compile>
+	  <Compile Update="Views\BillPage.xaml.cs">
+	    <DependentUpon>BillPage.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\MonthlyBillPage.xaml.cs">
+	    <DependentUpon>MonthlyBillPage.xaml</DependentUpon>
+	  </Compile>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -117,10 +128,7 @@
 	  <MauiXaml Update="Resources\Theme\LightTheme.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Views\BillCategoryPage.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Views\BillDatePage.xaml">
+	  <MauiXaml Update="Views\BillPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\ConfigurationPage.xaml">
@@ -130,6 +138,9 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\LoginPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\MonthlyBillPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\NewCalculatorPage.xaml">

@@ -16,7 +16,7 @@ namespace CalculadoraFuncional.Drawables
         private int widthColumns { get; } = 50;
         private int spacingBetweenColumns { get;  } = 5;
         private float totalHeigthColumn { get; } = 235;
-        private float marginCartesianLines { get; } = 10;
+        private float marginCartesianLines { get; } = 65;
         private double Max { get; set; }
 
         private List<Bill> bills;
@@ -33,8 +33,22 @@ namespace CalculadoraFuncional.Drawables
                 return;
 
             DrawCartesianLines(ref canvas);
+            DrawMaxValue(ref canvas);
             DrawColumns(ref canvas, bills);
             DrawDateOfBill(ref canvas, bills);
+        }
+        private void DrawMaxValue(ref ICanvas canvas)
+        {
+            if (Application.Current.RequestedTheme == AppTheme.Dark)
+                canvas.FontColor = Colors.LightGrey;
+            else
+                canvas.FontColor = Colors.Gray;
+
+            float _width = (float)Convert.ToDouble(Width);
+
+            canvas.Font = Microsoft.Maui.Graphics.Font.DefaultBold;
+            
+            canvas.DrawString(Max.ToString("C"), marginCartesianLines - 60, 0, 60, 25 , HorizontalAlignment.Left, VerticalAlignment.Center);
         }
         private void DrawCartesianLines(ref ICanvas canvas)
         {
@@ -47,7 +61,7 @@ namespace CalculadoraFuncional.Drawables
 
             canvas.StrokeSize = 3;
             canvas.DrawLine(marginCartesianLines, 0, marginCartesianLines, 250);
-            canvas.DrawLine(0, 240, _width, 240);
+            canvas.DrawLine(55, 240, _width, 240);
         }
         private void DrawColumns(ref ICanvas canvas, List<Bill> _bills)
         {
@@ -85,7 +99,7 @@ namespace CalculadoraFuncional.Drawables
             {
                 
                 int xPosition = 0;
-                int yPosition = (int)(totalHeigthColumn + marginCartesianLines);
+                int yPosition = (int)(totalHeigthColumn + marginCartesianLines - 60);
                 string text;
 
                 if (Application.Current.RequestedTheme == AppTheme.Dark)

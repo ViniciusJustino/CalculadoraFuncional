@@ -35,6 +35,9 @@ namespace CalculadoraFuncional.ViewModels
 
             }
         }
+
+        public Category CategorySelected;
+
         public string EntryText
         {
             get => _calculator.Expression;
@@ -46,9 +49,10 @@ namespace CalculadoraFuncional.ViewModels
         }
         public string Result
         {
-            get => _calculator?.Result?.OperatorValue;
+            get => _calculator?.Result;
         }
         public ObservableCollection<Calculator> historyCalc { get; set; }
+        public ObservableCollection<Category> categories { get; set; }
 
         //Commands definition
         public ICommand TextChanged { get; private set; }
@@ -57,6 +61,8 @@ namespace CalculadoraFuncional.ViewModels
         public ICommand EqualsButtonClickCommmand { get; private set; }
         public ICommand ScrollCommand { get; private set; }
         public ICommand SelectCalculationCommand { get; private set; }
+        public ICommand SaveBillCommand { get; private set; }
+        public ICommand DeleteBillCommand { get; private set; }
 
         //Events definition
         //public event PropertyChangedEventHandler EntryPropertyChanged;
@@ -69,6 +75,8 @@ namespace CalculadoraFuncional.ViewModels
             DeteleButtonClickCommmand = new AsyncRelayCommand(DeteleButtonClickTask);
             EqualsButtonClickCommmand = new AsyncRelayCommand(EqualsButtonClickTask);
             SelectCalculationCommand = new AsyncRelayCommand<Calculator>(SelectCalculationTask);
+            SaveBillCommand   = new AsyncRelayCommand(SaveBillAsync);
+            DeleteBillCommand = new AsyncRelayCommand(DeleteBillAsync);
 
             Init();
 
@@ -93,7 +101,7 @@ namespace CalculadoraFuncional.ViewModels
                 {
                     if(Operation.IsOperation(newChar))
                     {
-                        if(!text.OldTextValue.Contains(newChar) || calculator.IsValidCalculation())
+                        if (!text.OldTextValue.Contains(newChar) || calculator.IsValidCalculation())
                             HandleOperations(ref entry, newChar);
                         else
                             entry.Text = entry.Text.Remove(indexNewChar, 1);
@@ -129,51 +137,54 @@ namespace CalculadoraFuncional.ViewModels
 
         private void HandleOperations(ref Entry entry, char newChar)
         {
-            if (calculator.Operation != null)
+            if ( !string.IsNullOrEmpty(calculator.Operation))
             {
                 if (!calculator.IsValidCalculation())
                 {
-                    int indexOldOperation = entry.Text.IndexOf(calculator.Operation.OperationValue);
+                    int indexOldOperation = entry.Text.IndexOf(calculator.Operation);
 
-                    if (entry.Text.Contains(calculator.Operation.OperationValue) && !calculator.Operation.OperationValue.Equals(newChar))
+                    if (entry.Text.Contains(calculator.Operation) && !calculator.Operation.Equals(newChar))
                         entry.Text = entry.Text.Remove(indexOldOperation, 1);
                     else if (!entry.Text.Contains(newChar))
                         entry.Text += newChar;
 
-                    calculator.Operation.OperationValue = newChar;
+                    calculator.Operation = char.ToString(newChar);
+                    return;
                 }
                 else
                 {
-                    if (calculator.NextOperation != null)
+                    if ( !string.IsNullOrEmpty(calculator.NextOperation) )
                     {
-                        int indexOldOperation = entry.Text.IndexOf(calculator.NextOperation.OperationValue);
+                        int indexOldOperation = entry.Text.IndexOf(calculator.NextOperation);
 
                         entry.Text = entry.Text.Remove(indexOldOperation, 1);
 
-                        calculator.NextOperation.OperationValue = newChar;
+                        calculator.NextOperation = char.ToString(newChar);
+                        return;
                     }
                     else
                     {
-                        calculator.NextOperation ??= new Operation() { OperationValue = newChar };
+                        calculator.NextOperation =  char.ToString(newChar) ;
+                        return;
                     }
                 }
             }
 
-            calculator.Operation ??= new Operation() { OperationValue = newChar };
+            calculator.Operation =  char.ToString(newChar) ;
         }
 
         private void HandleOperators(ref Entry entry, char newChar)
         {
             int indexOperator = 0;
 
-            if(calculator.Operation != null)
-                indexOperator = entry.Text.IndexOf((calculator.Operation.OperationValue));
+            if(!string.IsNullOrEmpty(calculator.Operation))
+                indexOperator = entry.Text.IndexOf((calculator.Operation));
 
-            if(calculator.Operator1 != null) 
+            if(!string.IsNullOrEmpty(calculator.Operator1)) 
             {
                 if (indexOperator > 0)
                 {
-                    if (!calculator.Operator1.OperatorValue.Equals(entry.Text[..(indexOperator)]))
+                    if (!calculator.Operator1.Equals(entry.Text[..(indexOperator)]))
                     {
                         string value = entry.Text[..(indexOperator)];
 
@@ -198,12 +209,12 @@ namespace CalculadoraFuncional.ViewModels
                             indexOperator--;
                         }
 
-                        calculator.Operator1.OperatorValue = value;
+                        calculator.Operator1 = value;
                     }
                 }
                 else
                 {
-                    if (!calculator.Operator1.OperatorValue.Equals(entry.Text))
+                    if (!calculator.Operator1.Equals(entry.Text))
                     {
                         if (entry.Text.Length == 1 && entry.Text == ",")
                             entry.Text.Insert(0, "0");
@@ -224,15 +235,15 @@ namespace CalculadoraFuncional.ViewModels
                             countComma--;
                         }
 
-                        calculator.Operator1.OperatorValue = value;
+                        calculator.Operator1 = value;
                     }
                 }
             }
-            if(calculator.Operator2 != null) 
+            if(!string.IsNullOrEmpty(calculator.Operator2)) 
             {
                 if (indexOperator > 0)
                 {
-                    if (!calculator.Operator2.OperatorValue.Equals(entry.Text[(indexOperator + 1)..]))
+                    if (!calculator.Operator2.Equals(entry.Text[(indexOperator + 1)..]))
                     {
                         string value = entry.Text[(indexOperator + 1)..];
 
@@ -256,11 +267,11 @@ namespace CalculadoraFuncional.ViewModels
                             indexOperator--;
                         }
 
-                        calculator.Operator2.OperatorValue = value;
+                        calculator.Operator2 = value;
                     }
                 }
             }
-            if(calculator.Operator1 == null)
+            if(string.IsNullOrEmpty( calculator.Operator1 ))
             {
                 if (indexOperator > 0)
                 {
@@ -270,7 +281,7 @@ namespace CalculadoraFuncional.ViewModels
                         indexOperator++;
                     }
 
-                    calculator.Operator1 = new Operator() { OperatorValue = entry.Text[..(indexOperator)] };
+                    calculator.Operator1 =  entry.Text[..(indexOperator)];
                 }
                 else
                 {
@@ -279,10 +290,10 @@ namespace CalculadoraFuncional.ViewModels
                         entry.Text = entry.Text.Insert(0, "0");
                     }
 
-                    calculator.Operator1 = new Operator() { OperatorValue = entry.Text };
+                    calculator.Operator1 = entry.Text;
                 }
             }
-            if(calculator.Operator2 == null)
+            if(string.IsNullOrEmpty( calculator.Operator2 ))
             {
                 if (indexOperator > 0)
                 {
@@ -294,7 +305,7 @@ namespace CalculadoraFuncional.ViewModels
                         entry.Text = entry.Text.Insert(indexOperator + 1, "0");
                     }
 
-                    calculator.Operator2 = new Operator() { OperatorValue = value };
+                    calculator.Operator2 = value;
                 }
             }
         }
@@ -302,36 +313,37 @@ namespace CalculadoraFuncional.ViewModels
         private void HandleRemoveOperators(ref Entry entry, char removedChar)
         {
 
-            if(calculator.Operation != null)
+            if( !string.IsNullOrEmpty(calculator.Operation))
             {
-                int indexOperation = entry.Text.IndexOf(calculator.Operation.OperationValue);
+                int indexOperation = entry.Text.IndexOf(calculator.Operation);
 
+                
                 string alterOperator1 = entry.Text[..indexOperation];
 
-                if (!calculator.Operator1.OperatorValue.Equals(alterOperator1))
-                    calculator.Operator1.OperatorValue = alterOperator1;
+                if (!calculator.Operator1.Equals(alterOperator1))
+                    calculator.Operator1 = alterOperator1;
 
                 if((entry.Text.Length - 1) > indexOperation)
                 {
                     string alterOperator2 = entry.Text[(indexOperation + 1)..];
 
-                    if (!calculator.Operator2.OperatorValue.Equals(alterOperator2))
-                        calculator.Operator2.OperatorValue = alterOperator2;
+                    if (!calculator.Operator2.Equals(alterOperator2))
+                        calculator.Operator2 = alterOperator2;
                 }
                 else
-                    calculator.Operator2 = null;
+                    calculator.Operator2 = string.Empty;
 
             }
             else
             {
                 if(entry.Text == null || entry.Text == "")
                 {
-                    calculator.Operator1 = null;
+                    calculator.Operator1 = string.Empty;
                 }
                 else
                 {
-                    if (!calculator.Operator1.OperatorValue.Equals(entry.Text))
-                        calculator.Operator1.OperatorValue = entry.Text;
+                    if (!calculator.Operator1.Equals(entry.Text))
+                        calculator.Operator1 = entry.Text;
                 }
             }
 
@@ -341,10 +353,10 @@ namespace CalculadoraFuncional.ViewModels
         {
             if(!calculator.CalculationCompleted)
             {
-                if (calculator.Operation != null &&
-                    calculator.Operation.OperationValue.Equals(removedChar))
+                if ( !string.IsNullOrEmpty(calculator.Operation) &&
+                    calculator.Operation.Equals(removedChar.ToString()))
                 {
-                    calculator.Operation = null;
+                    calculator.Operation = string.Empty;
                 }
             }
         }
@@ -477,6 +489,26 @@ namespace CalculadoraFuncional.ViewModels
             calculator = newCalculator;
         }
 
+        private async Task SaveBillAsync()
+        {
+            
+            //_ = App.localDatabase.UpdateBillAsync(_bill);
+            
+            await App.localDatabase.UpdateBillAsync(this._bill);
+
+            string name = "bill_" + DateTime.Now.ToString();
+            this._bill = new Bill() { Name = name, Date = DateTime.Now };
+
+            await App.localDatabase.AddBill(this._bill);
+
+            this._calculator.IdBill = this._bill.Id;
+        }
+
+        private async Task DeleteBillAsync()
+        {
+
+        }
+
         public virtual void Subscribe(IObservable<object> provider)
         {
             provider.Subscribe(this);
@@ -485,10 +517,9 @@ namespace CalculadoraFuncional.ViewModels
         public void OnCompleted()
         {
             Calculator newCalculator = new();
-            newCalculator.IdBill = _bill.Id;
 
-            _bill.Value = Convert.ToDouble(_calculator.Result.OperatorValue);
-            _= App.localDatabase.UpdateBillAsync(_bill);
+            _bill.Value = Convert.ToDouble(_calculator.Result);
+            _= App.localDatabase.UpdateCalculatorAsync(_calculator);
 
             NewCalculator(ref _calculator, ref newCalculator);
 
@@ -519,7 +550,7 @@ namespace CalculadoraFuncional.ViewModels
             {
                 newCalculator.Operator1 = oldCalculator.Result;
                 newCalculator.Operation = oldCalculator.NextOperation;
-                newCalculator.Expression = oldCalculator.Result?.OperatorValue + oldCalculator.NextOperation?.OperationValue;
+                newCalculator.Expression = oldCalculator.Result + oldCalculator.NextOperation;
 
                 foreach (IObserver<object> observer in oldCalculator.observers)
                 {
@@ -531,13 +562,17 @@ namespace CalculadoraFuncional.ViewModels
                 newCalculator.Operator1 = oldCalculator.Operator1;
                 newCalculator.Operator2 = oldCalculator.Operator2;
                 newCalculator.Operation = oldCalculator.Operation;
-                newCalculator.Expression = oldCalculator.Operator1?.OperatorValue + oldCalculator.Operation?.OperationValue + oldCalculator.Operator2?.OperatorValue;
+                newCalculator.Expression = oldCalculator.Operator1 + oldCalculator.Operation + oldCalculator.Operator2;
 
                 foreach (IObserver<object> observer in oldCalculator.observers)
                 {
                     newCalculator.Subscribe(observer);
                 }
             }
+
+            newCalculator.IdBill = this._bill.Id;
+
+            _= App.localDatabase.AddCalculator(newCalculator);
 
             Subscribe(newCalculator);
         }
@@ -560,12 +595,16 @@ namespace CalculadoraFuncional.ViewModels
 
         private async void Init()
         {
-            Random rng = new Random();
-            string name = rng.Next().ToString();
+            string name = "bill_" + DateTime.Now.ToString();
+            this._bill = new Bill() { Name = name , Date = DateTime.Now };
 
-            await App.localDatabase.AddBill(new Bill() { Name = name });
+            this._calculator.IdBill = this._bill.Id;
 
-            //_bill = await App.localDatabase.GetBillAsync(name)
+            await App.localDatabase.AddBill(this._bill);
+            await App.localDatabase.AddCalculator(this._calculator);
+
+            categories = new ObservableCollection<Category>(await App.localDatabase.GetAllCategories());
+            OnPropertyChanged(nameof(categories));
         }
     }
 }

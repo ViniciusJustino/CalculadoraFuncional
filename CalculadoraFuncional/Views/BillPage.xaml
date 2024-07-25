@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="CalculadoraFuncional.Views.BillPage"
+             Title="Compra">
+
+    <VerticalStackLayout Padding="15" VerticalOptions="Fill">
+        <StackLayout>
+            <Entry Text="{Binding Name}" />
+            <DatePicker Date="{Binding Date}"/>
+            <Label Text="{Binding NameCategory}"/>
+        </StackLayout>
+        <Border Grid.Row="2" Grid.Column="0"
+                StrokeShape="RoundRectangle 10,10,10,10"
+                Margin="15,15,15,0"
+                Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray900}}">
+            <ListView x:Name="listCalculator"
+                      SelectionMode="None" 
+                      ItemsSource="{Binding ListCalculation}"
+                      SelectedItem="{Binding Calculator}"
+                      IsPullToRefreshEnabled="True"
+                      IsRefreshing="{Binding IsRefreshing}"
+                      RefreshCommand="{Binding RefreshCommand}"
+                      VerticalOptions="Fill"
+                      HeightRequest="500"
+                      Background="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray900}}">
+                    <ListView.Header>
+                        <StackLayout>
+                            <Label Margin="15" HorizontalOptions="CenterAndExpand" Text="Histórico de Calculos"/>
+                        </StackLayout>
+                    </ListView.Header>
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <ViewCell>
+                            <StackLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand">
+                                <StackLayout Orientation="Horizontal" Margin="10" HeightRequest="50" HorizontalOptions="CenterAndExpand">
+                                    <Label VerticalOptions="Center" Margin="10,0,5,0" Text="{Binding Operator1}"/>
+                                    <Label VerticalOptions="Center" Margin="10,0,5,0" Text="{Binding Operation}"  />
+                                    <Label VerticalOptions="Center" Margin="10,0,5,0" Text="{Binding Operator2}"/>
+                                </StackLayout>
+                                <StackLayout Orientation="Horizontal" Margin="10" HeightRequest="50" HorizontalOptions="End">
+                                    <ImageButton Background="Transparent"
+                                                 Margin="0" Padding="0" 
+                                                 HeightRequest="50"
+                                                 WidthRequest="50"
+                                                 VerticalOptions="Center"
+                                                 HorizontalOptions="End"
+                                                 MinimumHeightRequest="0"
+                                                 MinimumWidthRequest="0"
+                                                 Aspect="Center"
+                                                 Command="{Binding Source={x:Reference listCalculator}, Path=BindingContext.DeleteCalculatorCommand}"
+                                                 CommandParameter="{Binding .}"
+                                                 Source="{AppThemeBinding Dark=trash_light.png, Light=trash.png}"/>
+                                </StackLayout>
+                            </StackLayout>
+                        </ViewCell>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+            </ListView>
+        </Border>
+    </VerticalStackLayout>
+
+    
+</ContentPage>

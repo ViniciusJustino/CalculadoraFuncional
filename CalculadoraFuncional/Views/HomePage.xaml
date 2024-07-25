@@ -6,43 +6,32 @@
              xmlns:drawables="clr-namespace:CalculadoraFuncional.Drawables"
              xmlns:viewModels="clr-namespace:CalculadoraFuncional.ViewModels"
              Title="Home">
+    <StackLayout VerticalOptions="StartAndExpand">
+        <StackLayout VerticalOptions="StartAndExpand" IsEnabled="{Binding IsVisibleMainPage}">
+            <ScrollView Margin="0,20,0,0" 
+                    HeightRequest="300" 
+                    Orientation="Both">
+                <GraphicsView HeightRequest="300"
+                          Drawable="{Binding GraphicsHandler}"
+                          WidthRequest="{Binding GraphicsHandler.Width}"
+                          Margin="5"
+                          />
+            </ScrollView>
 
-
-    <ScrollView VerticalScrollBarVisibility="Never">
-        <Grid ColumnDefinitions="*" RowDefinitions="50,300,*" VerticalOptions="StartAndExpand">
-            <Label Grid.Row="0" Grid.Column="0"
-                       Text="Home"
-                       VerticalOptions="Center" 
-                       HorizontalOptions="Center" />
-            <HorizontalStackLayout Grid.Row="1" Grid.Column="0">
-                <Label Margin="3" Text="{Binding MaxValue}" HorizontalOptions="Start" VerticalOptions="Start"/>
-                <ScrollView FlowDirection="LeftToRight"
-                            Orientation="Horizontal"
-                            HorizontalScrollBarVisibility="Always"
-                            VerticalOptions="Fill"
-                            HorizontalOptions="CenterAndExpand">
-                    <GraphicsView x:Name="graphicView"
-                                  HeightRequest="300" 
-                                  Drawable="{Binding GraphicsHandler}"
-                                  WidthRequest="{Binding GraphicsHandler.Width}"
-                                  Margin="5"/>
-                </ScrollView>
-            </HorizontalStackLayout>
             <Border Grid.Row="2" Grid.Column="0"
-                    StrokeShape="RoundRectangle 10,10,10,10"
-                    VerticalOptions="FillAndExpand"
-                    Margin="15"
-                    Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray900}}">
-                
-                <ListView 
-                          SelectionMode="Single" 
-                          ItemsSource="{Binding HistoryBills}"
-                          SelectedItem="{Binding ItemBillsSelected}"
-                          IsPullToRefreshEnabled="True"
-                          IsRefreshing="{Binding IsRefreshing}"
-                          RefreshCommand="{Binding RefreshCommand}"
-                          VerticalOptions="StartAndExpand"
-                          Background="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray900}}">
+                StrokeShape="RoundRectangle 10,10,10,10"
+                VerticalOptions="FillAndExpand"
+                Margin="15,15,15,0"
+                Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray900}}">
+                <ListView x:Name="listMonthlyBill"
+                      SelectionMode="Single" 
+                      ItemsSource="{Binding HistoryBills}"
+                      SelectedItem="{Binding ItemBillsSelected}"
+                      IsPullToRefreshEnabled="True"
+                      IsRefreshing="{Binding IsRefreshing}"
+                      RefreshCommand="{Binding RefreshCommand}"
+                      VerticalOptions="StartAndExpand"
+                      Background="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray900}}">
                     <ListView.Header>
                         <StackLayout>
                             <Label Margin="15" HorizontalOptions="CenterAndExpand" Text="Resumo de compras"/>
@@ -51,19 +40,39 @@
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <ViewCell>
-                                <Grid ColumnDefinitions="*,*"
-                                      RowDefinitions="*"
-                                      Margin="10">
-                                    <Label VerticalOptions="Center" HorizontalOptions="Start" Grid.Row="0" Grid.Column="0" Text="{Binding Month}"/>
-                                    <Label VerticalOptions="Center" HorizontalOptions="End" Grid.Row="0" Grid.Column="2" Text="{Binding Total}"/>
-                                </Grid>
+                                <StackLayout Orientation="Horizontal" Margin="10" HeightRequest="50" HorizontalOptions="FillAndExpand">
+                                    <StackLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand">
+                                        <Label VerticalOptions="Center" HorizontalOptions="Start" Text="{Binding Month}"/>
+                                        <Label VerticalOptions="Center" HorizontalOptions="EndAndExpand" Text="{Binding Total}"/>
+                                    </StackLayout>
+                                    <StackLayout  HorizontalOptions="End">
+                                        <ImageButton Background="Transparent"
+                                                 Margin="0" Padding="0" 
+                                                 HeightRequest="50"
+                                                 WidthRequest="50"
+                                                 VerticalOptions="Center"
+                                                 HorizontalOptions="Center"
+                                                 MinimumHeightRequest="0"
+                                                 MinimumWidthRequest="0"
+                                                 Aspect="Center"
+                                                 Command="{Binding Source={x:Reference listMonthlyBill}, Path=BindingContext.GoToMonthlyAllBillCommand}"
+                                                 CommandParameter="{Binding .}"
+                                                 Source="{AppThemeBinding Light=arrow_right.png, Dark=arrow_right_light.png}"/>
+                                    </StackLayout>
+                                </StackLayout>
+
                             </ViewCell>
                         </DataTemplate>
                     </ListView.ItemTemplate>
                 </ListView>
-
             </Border>
-        </Grid>
-    </ScrollView>
-    
+        </StackLayout>
+        <StackLayout IsVisible="{Binding IsChangeNextPage}" VerticalOptions="CenterAndExpand">
+        <ActivityIndicator VerticalOptions="Center" 
+                   HorizontalOptions="Center" 
+                   IsRunning="{Binding IsChangeNextPage}" 
+                   IsVisible="{Binding IsChangeNextPage}"
+                   Color="{AppThemeBinding Light={StaticResource PrimaryDark}, Dark={StaticResource Primary}}"/>
+        </StackLayout>
+    </StackLayout>
 </ContentPage>

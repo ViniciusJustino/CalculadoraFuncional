@@ -35,6 +35,10 @@ namespace CalculadoraFuncional
             builder.Services.AddSingleton<RegisterViewModel>();
             builder.Services.AddSingleton<HomePage>();
             builder.Services.AddSingleton<HomeViewModel>();
+            builder.Services.AddSingleton<MonthlyBillPage>();
+            builder.Services.AddSingleton<MonthlyBillViewModel>();
+            builder.Services.AddSingleton<BillPage>();
+            builder.Services.AddSingleton<BillViewModel>();
 
             return builder.Build();
         }

@@ -18,6 +18,9 @@ namespace CalculadoraFuncional.Models
         public int Id { get; set; }
 
         [MaxLength(100)]
+        public string Title { get; set; }
+
+        [MaxLength(100)]
         public string Name { get; set; }
 
         [MaxLength(50)]

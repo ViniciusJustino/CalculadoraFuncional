@@ -1,4 +1,5 @@
 ﻿using CalculadoraFuncional.Models;
+using CalculadoraFuncional.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
@@ -21,13 +22,26 @@ namespace CalculadoraFuncional.ViewModels
                 if (_itemSelected != value && value != null)
                 {
                     SelectItem(value);
-                    ItemBillsSelected = null;
-
+                }
+                else if(_itemSelected == value || value == null)
+                {
+                    SelectItem(null);
                 }
             }
         }
+
+        [ObservableProperty]
+        private bool _isBillSelected;
+
+        [ObservableProperty]
+        private bool _isChangeNextPage;
+        [ObservableProperty]
+        private bool _isVisibleMainPage = true;
+
         public Drawables.GraphicsHandler GraphicsHandler { get; private set; }
         public ICommand RefreshCommand { get; private set; }
+        public ICommand MonthlyAllBillCommand { get; private set; }
+        public ICommand GoToMonthlyAllBillCommand { get; private set; }
         public bool IsRefreshing { get; set; }
         public double MaxValue { get; set; }
         private int MonthSelected { get; set; }
@@ -41,6 +55,8 @@ namespace CalculadoraFuncional.ViewModels
 
             Init();
             RefreshCommand = new AsyncRelayCommand(RefreshListViewAsync);
+            MonthlyAllBillCommand = new AsyncRelayCommand(GoToMonthlyAllBillAsync);
+            GoToMonthlyAllBillCommand = new AsyncRelayCommand<MonthlyBills>(GotoMonthlyAllBillAsync);
         }
 
         private async void Init()
@@ -102,14 +118,60 @@ namespace CalculadoraFuncional.ViewModels
             return _bills.OrderBy(b => b.Date);
         }
 
+        private async Task GoToMonthlyAllBillAsync()
+        {
+            if (_itemSelected == null)
+                return;
+
+            Dictionary<string, object> navigationData = new Dictionary<string, object>
+            {
+                { "MonthlyBill", _itemSelected }
+            };
+
+            await Shell.Current.GoToAsync(nameof(MonthlyBillPage), true, navigationData);
+
+
+            //await Shell.Current.GoToAsync($"{nameof(Views.NotePage)}?load={note.Identifier}");
+
+        }
+
+        private async Task GotoMonthlyAllBillAsync(MonthlyBills Monthly)
+        {
+            
+            if (Monthly == null)
+                return;
+
+            IsChangeNextPage = !IsChangeNextPage;
+            IsVisibleMainPage = !IsVisibleMainPage;
+
+            Dictionary<string, object> navigationData = new Dictionary<string, object>
+            {
+                { "MonthlyBill", Monthly }
+            };
+
+            await Shell.Current.GoToAsync(nameof(MonthlyBillPage), true, navigationData);
+
+            IsChangeNextPage = !IsChangeNextPage;
+            IsVisibleMainPage = !IsVisibleMainPage;
+            //await Shell.Current.GoToAsync($"{nameof(Views.NotePage)}?load={note.Identifier}");
+
+        }
+
         private void SelectItem(MonthlyBills value)
         {
+            if (value == null)
+            {
+                _itemSelected = null;
+                IsBillSelected = false;
+                OnPropertyChanged(nameof(this.ItemBillsSelected));
+                return;
+            }
+
             _itemSelected = value;
+            IsBillSelected = true;
 
             MonthSelected = _itemSelected.MonthNumber;
             YearSelected = _itemSelected.Year;
-
-            OnPropertyChanged(nameof(this.ItemBillsSelected));
 
             IEnumerable<Bill> _bills = _itemSelected.Bills.Select(billViewModel => billViewModel.bill);
 

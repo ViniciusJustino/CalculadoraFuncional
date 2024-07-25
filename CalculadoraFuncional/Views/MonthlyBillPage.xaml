@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="CalculadoraFuncional.Views.MonthlyBillPage"
+             Title="Compras Mensal">
+    <ScrollView VerticalOptions="StartAndExpand">
+        <ListView x:Name="listAllBills"
+                SelectionMode="None"
+              ItemsSource="{Binding MonthlyAllBill}"
+              SelectedItem="{Binding BillViewModel}"
+              IsPullToRefreshEnabled="True"
+              IsRefreshing="{Binding IsRefreshing}"
+              RefreshCommand="{Binding RefreshCommand}"
+              Background="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray900}}">
+            <ListView.Header>
+                <StackLayout>
+                    <Label Margin="15" HorizontalOptions="CenterAndExpand" Text="Compras"/>
+                </StackLayout>
+            </ListView.Header>
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <ViewCell >
+                        <StackLayout Orientation="Horizontal" Margin="10" HeightRequest="50">
+                            <StackLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand">
+                                <Label VerticalOptions="Center" HorizontalOptions="Start" Text="{Binding Name}"/>
+                                <Label VerticalOptions="Center" HorizontalOptions="EndAndExpand" Text="{Binding CurrentTotal}"/>
+                            </StackLayout>
+                            <StackLayout Orientation="Horizontal" HorizontalOptions="End">
+                                <ImageButton Background="Transparent"
+                                             Margin="0" Padding="0" 
+                                             HeightRequest="50"
+                                             WidthRequest="50"
+                                             VerticalOptions="Center"
+                                             HorizontalOptions="Start"
+                                             Aspect="Center"
+                                             Command="{Binding Source={x:Reference listAllBills}, Path=BindingContext.GoToBillCommand}"
+                                             CommandParameter="{Binding .}"
+                                             Source="{AppThemeBinding Light=arrow_right.png, Dark=arrow_right_light.png}"/>
+                                <ImageButton Background="Transparent"
+                                             Margin="0" Padding="0" 
+                                             HeightRequest="50"
+                                             WidthRequest="50"
+                                             VerticalOptions="Center"
+                                             HorizontalOptions="End"
+                                             MinimumHeightRequest="0"
+                                             MinimumWidthRequest="0"
+                                             Aspect="Center"
+                                             Command="{Binding Source={x:Reference listAllBills}, Path=BindingContext.DeleteBillCommand}"
+                                             CommandParameter="{Binding IdBill}"
+                                             Source="{AppThemeBinding Dark=trash_light.png, Light=trash.png}"/>
+                            </StackLayout>
+                        </StackLayout>
+                    </ViewCell>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </ScrollView>
+</ContentPage>
