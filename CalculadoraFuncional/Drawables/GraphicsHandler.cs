@@ -7,19 +7,26 @@ using System.Text;
 using System.Threading.Tasks;
 using CalculadoraFuncional.Models;
 using System.Globalization;
+using CommunityToolkit.Mvvm.ComponentModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
 
 namespace CalculadoraFuncional.Drawables
 {
-    public class GraphicsHandler: IDrawable
+    public class GraphicsHandler:INotifyPropertyChanged, IDrawable
     {
         public string Width { get; set; }
         private int widthColumns { get; } = 50;
         private int spacingBetweenColumns { get;  } = 5;
         private float totalHeigthColumn { get; } = 235;
         private float marginCartesianLines { get; } = 65;
+        private float widthMaxValueString { get;  } = 60;
+        private float heightMaxValueString { get; } = 25;
         private double Max { get; set; }
 
         private List<Bill> bills;
+
+        public event PropertyChangedEventHandler PropertyChanged;
 
         public GraphicsHandler(ref IEnumerable<Bill> _bills)
         {
@@ -27,6 +34,9 @@ namespace CalculadoraFuncional.Drawables
 
             bills = _bills?.ToList();
         }
+
+        
+
         public void Draw(ICanvas canvas, RectF dirtyRect)
         {
             if (bills == null)
@@ -48,7 +58,7 @@ namespace CalculadoraFuncional.Drawables
 
             canvas.Font = Microsoft.Maui.Graphics.Font.DefaultBold;
             
-            canvas.DrawString(Max.ToString("C"), marginCartesianLines - 60, 0, 60, 25 , HorizontalAlignment.Left, VerticalAlignment.Center);
+            canvas.DrawString(Max.ToString("C"), marginCartesianLines - 60, 0, widthMaxValueString, heightMaxValueString , HorizontalAlignment.Left, VerticalAlignment.Center);
         }
         private void DrawCartesianLines(ref ICanvas canvas)
         {
@@ -133,8 +143,10 @@ namespace CalculadoraFuncional.Drawables
                 return;
             
             this.Max = _bills.MaxBy(maxValue => maxValue.Value).Value;
-            this.Width = ((_bills.Count() * spacingBetweenColumns) + (_bills.Count() * widthColumns) + marginCartesianLines).ToString();
+            this.Width = ((_bills.Count() * spacingBetweenColumns) + (_bills.Count() * widthColumns) + marginCartesianLines + widthMaxValueString).ToString();
 
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Max)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Width)));
         }
     }
 }

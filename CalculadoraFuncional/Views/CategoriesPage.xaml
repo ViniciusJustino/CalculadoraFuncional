@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="CalculadoraFuncional.Views.CategoriesPage"
+             xmlns:viewModel="clr-namespace:CalculadoraFuncional.ViewModels"
+             xmlns:converters="clr-namespace:CalculadoraFuncional.Converter"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             Title="Categorias">
+    <ContentPage.BindingContext>
+        <viewModel:CategoriesViewModel/>
+    </ContentPage.BindingContext>
+    
+    <ContentPage.Resources>
+        <converters:StringToColor x:Key="stringToColor"/>
+    </ContentPage.Resources>
+    
+    <StackLayout Orientation="Vertical"
+                 VerticalOptions="StartAndExpand">
+
+        <StackLayout Margin="20" Orientation="Horizontal" HorizontalOptions="Fill">
+            <Entry Text="{Binding CategorySelected.NameCategory}" Placeholder="Nome da categoria" HorizontalOptions="Start" VerticalOptions="Center"/>
+            <Entry x:Name="textColor"
+                   Text="{Binding CategorySelected.ColorHex}" 
+                   Placeholder="Cor em Hexadecimal" 
+                   HorizontalOptions="EndAndExpand" 
+                   VerticalOptions="Center">
+                <Entry.Behaviors>
+                    <toolkit:MaskedBehavior Mask="#XXXXXX"/>
+                </Entry.Behaviors>
+            </Entry>
+        </StackLayout>
+        <StackLayout Orientation="Horizontal" HorizontalOptions="Fill">
+            <ImageButton Background="Transparent"
+                         Margin="0,0,20,0" Padding="0" CornerRadius="0"
+                         ToolTipProperties.Text="Salvar alterações"
+                         HeightRequest="30"
+                         WidthRequest="30" 
+                         IsVisible="True"
+                         Source="{AppThemeBinding Dark=save_light.png, Light=save.png}"
+                         HorizontalOptions="EndAndExpand" VerticalOptions="Center"
+                         Command="{Binding SaveCategoriesCommand}"/>
+            <ImageButton Background="Transparent"
+                         Margin="0,0,20,0" Padding="0" 
+                         ToolTipProperties.Text="Adicionar nova categoria"
+                         HeightRequest="30"
+                         WidthRequest="30" 
+                         Source="{AppThemeBinding Light=plus.png, Dark=plus_light.png}"
+                         HorizontalOptions="End" VerticalOptions="Center"
+                         Command="{Binding NewCategoryCommand}"/>
+        </StackLayout>
+        <Border StrokeShape="RoundRectangle 10,10,10,10"
+                Margin="15,15,15,0"
+                VerticalOptions="FillAndExpand"
+                Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray900}}">
+
+            <ListView x:Name="listAllCategories"
+              SelectionMode="Single" 
+              ItemsSource="{Binding listCategories}"
+              SelectedItem="{Binding CategorySelected}"
+              VerticalOptions="StartAndExpand"
+              IsPullToRefreshEnabled="True"       
+              IsRefreshing="{Binding IsRefreshing}"
+              RefreshCommand="{Binding RefreshCommand}"
+              Background="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray900}}">
+                <ListView.Header>
+                    <StackLayout>
+                        <Label Margin="15" HorizontalOptions="CenterAndExpand" Text="Perfil"/>
+                    </StackLayout>
+                </ListView.Header>
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ViewCell>
+                            <StackLayout Orientation="Horizontal" HeightRequest="50" Margin="10" HorizontalOptions="FillAndExpand">
+                                <Label Text="{Binding NameCategory}" HorizontalOptions="StartAndExpand" VerticalOptions="Center" />
+                                
+                                <ImageButton Background="Transparent"
+                                             Margin="0" Padding="0" CornerRadius="0"
+                                             HeightRequest="20"
+                                             WidthRequest="20"
+                                             VerticalOptions="Center"
+                                             HorizontalOptions="End"
+                                             IsVisible="{Binding IsEdited}"
+                                             Aspect="AspectFill"
+                                             Command="{Binding Source={x:Reference listAllCategories}, Path=BindingContext.SaveCategoryCommand}"
+                                             CommandParameter="{Binding .}"
+                                             Source="{AppThemeBinding Dark=save_light.png, Light=save_dark.png}"/>
+                                
+                                <ImageButton Background="Transparent"
+                                             Margin="0" Padding="0" 
+                                             HeightRequest="50"
+                                             WidthRequest="50"
+                                             VerticalOptions="Center"
+                                             HorizontalOptions="End"
+                                             Aspect="Center"
+                                             Command="{Binding Source={x:Reference listAllCategories}, Path=BindingContext.DeleteCategoryCommand}"
+                                             CommandParameter="{Binding .}"
+                                             Source="{AppThemeBinding Dark=trash_light.png, Light=trash.png}"/>
+                            </StackLayout>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+
+        </Border>
+    </StackLayout>
+</ContentPage>

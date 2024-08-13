@@ -1,3 +1,4 @@
+using CalculadoraFuncional.ViewModels;
 using System.Diagnostics;
 
 namespace CalculadoraFuncional.Views;
@@ -24,7 +25,12 @@ public partial class NewCalculatorPage : ContentPage
 
     protected override void OnDisappearing()
     {
+        _= ((NewCalculatorViewModel)BindingContext).ValidationInDataBaseAsync();
+
         base.OnDisappearing();
         Debug.WriteLine("NewCalculatorPage Desativado");
+
+
     }
+
 }

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="CalculadoraFuncional.Views.CategoryPage"
+             xmlns:colorPicker="https://trungnt2910.github.io/schemas/maui/2022/colorpicker"
+             Title="Nova Categoria"
+             >
+    <ContentPage.ToolbarItems>
+        <ToolbarItem IconImageSource="check.png" ToolTipProperties.Text="Salvar Categoria" Command="{Binding SaveCategoryCommand}"/>
+        <ToolbarItem IconImageSource="xmark.png" ToolTipProperties.Text="Cancelar Adição" Command="{Binding CancelCategoryCommand}"/>
+    </ContentPage.ToolbarItems>
+
+    <StackLayout Margin="20" Orientation="Vertical" HorizontalOptions="Fill">
+        <StackLayout Orientation="Horizontal">
+            <Entry Text="{Binding NameCategory}" 
+                   Placeholder="Nome da categoria" 
+                   HorizontalOptions="Start" 
+                   VerticalOptions="Start"/>
+            <Entry x:Name="SelectedColorValueEntry" 
+                   IsReadOnly="True" Text="{Binding ColorHex}" 
+                   Placeholder="Cor em Hexadecimal" 
+                   HorizontalOptions="EndAndExpand" 
+                   VerticalOptions="Start"/>
+        </StackLayout>
+
+        <StackLayout Orientation="Vertical"
+                     VerticalOptions="Start">
+            <Border x:Name="ColorPickerHolderFrame"
+                    HeightRequest="200"
+                    HorizontalOptions="Center"
+                    StrokeShape="RoundRectangle 10,10,10,10"
+                    WidthRequest="350">
+                <colorPicker:ColorPicker
+                           x:Name="ColorPicker"
+                           ColorFlowDirection="Horizontal"
+                           ColorSpectrumStyle="TintToHueToShadeStyle"
+                           PickedColorChanged="ColorPicker_PickedColorChanged"
+                           PickedColor="Blue">
+                    <colorPicker:ColorPicker.BaseColorList>
+                        <x:Array Type="{x:Type x:String}">
+                            <!--  Red  -->
+                            <x:String>#ff0000</x:String>
+                            <!--  Yellow  -->
+                            <x:String>#ffff00</x:String>
+                            <!--  Green (Lime)  -->
+                            <x:String>#00ff00</x:String>
+                            <!--  Aqua  -->
+                            <x:String>#00ffff</x:String>
+                            <!--  Blue  -->
+                            <x:String>#0000ff</x:String>
+                            <!--  Fuchsia  -->
+                            <x:String>#ff00ff</x:String>
+                            <!--  Red  -->
+                            <x:String>#ff0000</x:String>
+                        </x:Array>
+                    </colorPicker:ColorPicker.BaseColorList>
+                </colorPicker:ColorPicker>
+            </Border>
+        </StackLayout>
+        <!--<Picker>
+            <Picker.ItemsSource>
+                <x:Object >
+                    
+                </x:Object>
+            </Picker.ItemsSource>
+        </Picker>-->
+    </StackLayout>
+</ContentPage>

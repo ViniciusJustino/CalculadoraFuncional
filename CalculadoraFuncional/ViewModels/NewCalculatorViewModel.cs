@@ -64,9 +64,6 @@ namespace CalculadoraFuncional.ViewModels
         public ICommand SaveBillCommand { get; private set; }
         public ICommand DeleteBillCommand { get; private set; }
 
-        //Events definition
-        //public event PropertyChangedEventHandler EntryPropertyChanged;
-
         public NewCalculatorViewModel()
         {
             calculator ??= new Models.Calculator();
@@ -114,24 +111,22 @@ namespace CalculadoraFuncional.ViewModels
                         HandleOperators(ref entry, newChar);
                     }
                 }
+
+                //TextToSpeech.SpeakAsync(entry.Text, SpeechOptions).Wait();
             }
             else if(text.OldTextValue.Contains(text.NewTextValue))
             {
-            
                 int indexRemoveChar = RemoveDifferentCharactersIndex(ref entry, ref text);
                 char removedChar = text.OldTextValue[indexRemoveChar];
 
                 if (char.IsDigit(removedChar) || removedChar.Equals(','))
                 {
-
                     HandleRemoveOperators(ref entry, removedChar);
-
                 }
                 else
                 {
                     HandleRemoveOperations(ref entry, removedChar);
                 }
-             
             }
         }
 
@@ -169,7 +164,6 @@ namespace CalculadoraFuncional.ViewModels
                     }
                 }
             }
-
             calculator.Operation =  char.ToString(newChar) ;
         }
 
@@ -492,8 +486,6 @@ namespace CalculadoraFuncional.ViewModels
         private async Task SaveBillAsync()
         {
             
-            //_ = App.localDatabase.UpdateBillAsync(_bill);
-            
             await App.localDatabase.UpdateBillAsync(this._bill);
 
             string name = "bill_" + DateTime.Now.ToString();
@@ -600,11 +592,42 @@ namespace CalculadoraFuncional.ViewModels
 
             this._calculator.IdBill = this._bill.Id;
 
-            await App.localDatabase.AddBill(this._bill);
-            await App.localDatabase.AddCalculator(this._calculator);
-
             categories = new ObservableCollection<Category>(await App.localDatabase.GetAllCategories());
             OnPropertyChanged(nameof(categories));
+        }
+
+        public async Task ValidationInDataBaseAsync()
+        {
+            if (await App.localDatabase.GetBillAsync(this._bill.Id) == null)
+            {
+                if(this.historyCalc.Count > 1 || this._calculator.CalculationCompleted)
+                { 
+                    await App.localDatabase.AddBill(this._bill);
+
+                    foreach (Calculator calculator in historyCalc)
+                    {
+                        calculator.IdBill = this._bill.Id;
+
+                        if(calculator.IsValidCalculation())
+                            await App.localDatabase.UpdateCalculatorAsync(calculator);
+                    }
+                   
+                    return;
+                }
+
+                return;
+            }
+
+            await App.localDatabase.UpdateBillAsync(this._bill);
+
+            foreach (Calculator calculator in historyCalc)
+            {
+                calculator.IdBill = this._bill.Id;
+
+                if (calculator.IsValidCalculation())
+                    await App.localDatabase.AddCalculator(calculator);
+            }
+            await App.localDatabase.UpdateCalculatorAsync(this._calculator);
         }
     }
 }

@@ -40,7 +40,6 @@ namespace CalculadoraFuncional.ViewModels
 
         public Drawables.GraphicsHandler GraphicsHandler { get; private set; }
         public ICommand RefreshCommand { get; private set; }
-        public ICommand MonthlyAllBillCommand { get; private set; }
         public ICommand GoToMonthlyAllBillCommand { get; private set; }
         public bool IsRefreshing { get; set; }
         public double MaxValue { get; set; }
@@ -55,7 +54,6 @@ namespace CalculadoraFuncional.ViewModels
 
             Init();
             RefreshCommand = new AsyncRelayCommand(RefreshListViewAsync);
-            MonthlyAllBillCommand = new AsyncRelayCommand(GoToMonthlyAllBillAsync);
             GoToMonthlyAllBillCommand = new AsyncRelayCommand<MonthlyBills>(GotoMonthlyAllBillAsync);
         }
 
@@ -71,7 +69,7 @@ namespace CalculadoraFuncional.ViewModels
             _ = LoadListBillsAsync(bills);
         }
 
-        private async Task RefreshListViewAsync()
+        public async Task RefreshListViewAsync()
         {
             IEnumerable<Bill> bills = await LoadBillsAsync();
             bool RefreshGraphic = !this.HistoryBills.Equals(bills);
@@ -118,22 +116,6 @@ namespace CalculadoraFuncional.ViewModels
             return _bills.OrderBy(b => b.Date);
         }
 
-        private async Task GoToMonthlyAllBillAsync()
-        {
-            if (_itemSelected == null)
-                return;
-
-            Dictionary<string, object> navigationData = new Dictionary<string, object>
-            {
-                { "MonthlyBill", _itemSelected }
-            };
-
-            await Shell.Current.GoToAsync(nameof(MonthlyBillPage), true, navigationData);
-
-
-            //await Shell.Current.GoToAsync($"{nameof(Views.NotePage)}?load={note.Identifier}");
-
-        }
 
         private async Task GotoMonthlyAllBillAsync(MonthlyBills Monthly)
         {

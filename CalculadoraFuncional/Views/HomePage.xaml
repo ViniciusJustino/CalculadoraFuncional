@@ -10,6 +10,7 @@
         <StackLayout VerticalOptions="StartAndExpand" IsEnabled="{Binding IsVisibleMainPage}">
             <ScrollView Margin="0,20,0,0" 
                     HeightRequest="300" 
+                    HorizontalOptions="Fill"
                     Orientation="Both">
                 <GraphicsView HeightRequest="300"
                           Drawable="{Binding GraphicsHandler}"
@@ -18,7 +19,7 @@
                           />
             </ScrollView>
 
-            <Border Grid.Row="2" Grid.Column="0"
+            <Border
                 StrokeShape="RoundRectangle 10,10,10,10"
                 VerticalOptions="FillAndExpand"
                 Margin="15,15,15,0"

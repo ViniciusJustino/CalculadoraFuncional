@@ -12,7 +12,7 @@
         <ToolbarItem IconImageSource="check.png" Command="{Binding SaveBillCommand}"/>
         <ToolbarItem IconImageSource="xmark.png" Command="{Binding DeleteBillCommand}"/>
     </ContentPage.ToolbarItems>
-   
+
     <Grid Margin="5" RowDefinitions="200,*" ColumnDefinitions="*">
         <Grid Grid.Row="0" 
               Grid.Column="0"  

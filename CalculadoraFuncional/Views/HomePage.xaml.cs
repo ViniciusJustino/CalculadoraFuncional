@@ -1,5 +1,6 @@
 using CalculadoraFuncional.Drawables;
 using CalculadoraFuncional.ViewModels;
+using CommunityToolkit.Mvvm.Input;
 using System.Diagnostics;
 
 namespace CalculadoraFuncional.Views;
@@ -19,7 +20,8 @@ public partial class HomePage : ContentPage
     {
         base.OnAppearing();
         Debug.WriteLine("HomePage Ativo");
-        ((HomeViewModel) BindingContext).RefreshCommand.Execute(this);
+
+        _= ((HomeViewModel)BindingContext).RefreshListViewAsync();
     }
 
     protected override void OnDisappearing()

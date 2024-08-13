@@ -16,7 +16,7 @@ namespace CalculadoraFuncional.ViewModels
     {
         public Models.Bill bill;
         
-        public string CurrentTotal => _total.ToString("C");
+        public string CurrentTotal => Total.ToString("C");
         public string ResumeDate  => Date.ToShortDateString();
         public string IdBill => bill.Id.ToString();
 

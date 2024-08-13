@@ -2,7 +2,9 @@
 using CalculadoraFuncional.Services;
 using CalculadoraFuncional.ViewModels;
 using CalculadoraFuncional.Views;
+using CommunityToolkit.Maui;
 using Microsoft.Extensions.Logging;
+using SkiaSharp.Views.Maui.Controls.Hosting;
 
 namespace CalculadoraFuncional
 {
@@ -13,6 +15,8 @@ namespace CalculadoraFuncional
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()
+                .UseSkiaSharp()
+                .UseMauiCommunityToolkit()
                 .ConfigureFonts(fonts =>
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
@@ -39,6 +43,10 @@ namespace CalculadoraFuncional
             builder.Services.AddSingleton<MonthlyBillViewModel>();
             builder.Services.AddSingleton<BillPage>();
             builder.Services.AddSingleton<BillViewModel>();
+            builder.Services.AddSingleton<ProfileViewModel>();
+            builder.Services.AddSingleton<ProfilePage>();
+            builder.Services.AddSingleton<CategoryViewModel>();
+            builder.Services.AddSingleton<CategoryPage>();
 
             return builder.Build();
         }

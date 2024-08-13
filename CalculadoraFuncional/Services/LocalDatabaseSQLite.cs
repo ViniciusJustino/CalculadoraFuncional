@@ -1,6 +1,7 @@
 ﻿using CalculadoraFuncional.Interface;
 using CalculadoraFuncional.Models;
 using CalculadoraFuncional.Properties;
+using CalculadoraFuncional.Views;
 using Google.Cloud.Firestore;
 using SQLite;
 using System;
@@ -32,8 +33,10 @@ namespace CalculadoraFuncional.Services
             var b = await Database.CreateTableAsync<Bill>();
             var cy = await Database.CreateTableAsync<Category>();
             var c = await Database.CreateTableAsync<Calculator>();
-            
+            var o = await Database.CreateTableAsync<Option>();
+
             InitCategories();
+            InitOptions();
 
         }
 
@@ -43,25 +46,42 @@ namespace CalculadoraFuncional.Services
 
             if(list.Count <= 0)
             {
-                List<string> ListCategories = new List<string>
+                List<Category> ListCategories = new List<Category>
                 {
-                    "Geral",
-                    "Hortifruti",
-                    "Padaria",
-                    "Carnes",
-                    "Laticínios",
-                    "Congelados",
-                    "Bebidas",
-                    "Molhos e Condimentos",
-                    "Café, Chá e Bebidas Quentes",
-                    "Limpeza e Higiene",
-                    "Cuidados com o Lar",
-                    "Cuidados Pessoais",
-                    "Snacks e Doces",
-                    "Alimentos Enlatados e Não Perecíveis"
+                    new Category() { NameCategory = "Geral" , ColorHex = ""},
+                    new Category() { NameCategory = "Hortifruti", ColorHex = "" },
+                    new Category() { NameCategory = "Padaria", ColorHex = "" },
+                    new Category() { NameCategory = "Carnes", ColorHex = "" },
+                    new Category() { NameCategory = "Laticínios", ColorHex = "" },
+                    new Category() { NameCategory = "Congelados", ColorHex = "" },
+                    new Category() { NameCategory = "Bebidas", ColorHex = "" },
+                    new Category() { NameCategory = "Molhos e Condimentos", ColorHex = "" },
+                    new Category() { NameCategory = "Café, Chá e Bebidas Quentes", ColorHex = "" },
+                    new Category() { NameCategory = "Limpeza e Higiene", ColorHex = "" }    ,
+                    new Category() { NameCategory = "Cuidados com o Lar", ColorHex = "" },
+                    new Category() { NameCategory = "Cuidados Pessoais", ColorHex = "" },
+                    new Category() { NameCategory = "Snacks e Doces", ColorHex = "" },
+                    new Category() { NameCategory = "Alimentos Enlatados e Não Perecíveis", ColorHex = "" }
                 };
 
-                await Database.InsertAllAsync(ListCategories.Select(x => new Category() { NameCategory = x}).ToList<Category>());
+                await Database.InsertAllAsync(ListCategories);
+            }
+            return;
+        }
+
+        private async void InitOptions()
+        {
+            List<Option> list = await Database.Table<Option>().ToListAsync();
+
+            if (list.Count <= 0)
+            {
+                List<Option> ListCategories = new List<Option>
+                {
+                    new Option(){ NickName = "Categorias" , NamePage = nameof(CategoriesPage)}
+                    
+                };
+
+                await Database.InsertAllAsync(ListCategories);
             }
         }
 
@@ -183,6 +203,13 @@ namespace CalculadoraFuncional.Services
             await Init();
 
             return await Database.DeleteAsync(category);
+        }
+
+        public async ValueTask<IEnumerable<Option>> GetAllOptions()
+        {
+            await Init();
+
+            return await Database.Table<Option>().ToListAsync();
         }
     }
 }

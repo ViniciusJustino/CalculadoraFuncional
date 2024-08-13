@@ -20,6 +20,8 @@ namespace CalculadoraFuncional.ViewModels
         [ObservableProperty]
         private bool _isRefreshing;
         private MonthlyBills monthlyBills;
+        private int MonthNumber;
+        private int Year;
         public ICommand RefreshCommand { get; private set; }
         public ICommand DeleteBillCommand { get; private set; }
         public ICommand GoToBillCommand { get; private set; }
@@ -50,17 +52,21 @@ namespace CalculadoraFuncional.ViewModels
         private void SetMonthlyAllBill(MonthlyBills monthlyBills)
         {
             MonthlyAllBill = new ObservableCollection<BillViewModel>(monthlyBills.Bills);
+
+            MonthNumber = monthlyBills.MonthNumber;
+            Year = monthlyBills.Year;
+
             OnPropertyChanged(nameof(MonthlyAllBill));
         }
 
         private async Task RefreshListViewAsync()
         {
-            if (this.IsRefreshing)
-            {
+            this.IsRefreshing = true;
 
+            var allBills = await App.localDatabase.GetAllBills();
+            MonthlyAllBill = new ObservableCollection<BillViewModel>( allBills.Where(b1 => b1.Date.Year == Year && b1.Date.Month == MonthNumber).Select(b => new BillViewModel(b)));
 
-            }
-
+            OnPropertyChanged(nameof(MonthlyAllBill));
             this.IsRefreshing = false;
         }
 
@@ -86,7 +92,7 @@ namespace CalculadoraFuncional.ViewModels
             {
                 { "Bill", billViewModel.bill }
             };
-
+            
             await Shell.Current.GoToAsync(nameof(BillPage), true, navigationData);
         }
     }

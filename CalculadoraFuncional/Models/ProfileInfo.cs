@@ -8,16 +8,12 @@ namespace CalculadoraFuncional.Models
 {
     class ProfileInfo
     {
-        
-        public static IEnumerable<ProfileInfo> LoadAll()
-        {
-            Random random = new Random();
-            List<ProfileInfo> _infos = new();
-            
+        public string Name { get; set; }
+        public string Email { get; set; }
+        public string PhoneNumber { get; set; }
+        public string PhotoUrl { get; set; }
+        public bool EmailVerified { get; set; }
+        public bool Disabled { get; set; }
 
-            
-
-            return _infos;
-        }
     }
 }
